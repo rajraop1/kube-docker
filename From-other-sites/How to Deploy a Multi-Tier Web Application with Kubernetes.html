@@ -1,0 +1,1012 @@
+<!doctype html><!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en" > <![endif]--><!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en" >        <![endif]--><!--[if IE 8]>    <html class="no-js lt-ie9" lang="en" >               <![endif]--><!--[if gt IE 8]><!--><html class="no-js" lang="en"><!--<![endif]--><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="author" content="Danielle Cook">
+    <meta name="description" content="Get a step-by-step guide on deploying a multi-tiered web application with a Redis backend in Kubernetes. Use the Fairwinds workshop Git Repository.">
+    <meta name="generator" content="HubSpot">
+    <title>How to Deploy a Multi-Tier Web Application with Kubernetes</title>
+    <link rel="shortcut icon" href="https://www.fairwinds.com/hubfs/fairwinds-mark.png">
+    
+
+    
+    <meta property="og:description" content="Get a step-by-step guide on deploying a multi-tiered web application with a Redis backend in Kubernetes. Use the Fairwinds workshop Git Repository.">
+    <meta property="og:title" content="How to Deploy a Multi-Tier Web Application with Kubernetes">
+    <meta name="twitter:description" content="Get a step-by-step guide on deploying a multi-tiered web application with a Redis backend in Kubernetes. Use the Fairwinds workshop Git Repository.">
+    <meta name="twitter:title" content="How to Deploy a Multi-Tier Web Application with Kubernetes">
+
+    
+
+    
+    <style>
+a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-box !important;box-sizing:content-box !important;vertical-align:middle}.hs-breadcrumb-menu{list-style-type:none;margin:0px 0px 0px 0px;padding:0px 0px 0px 0px}.hs-breadcrumb-menu-item{float:left;padding:10px 0px 10px 10px}.hs-breadcrumb-menu-divider:before{content:'›';padding-left:10px}.hs-featured-image-link{border:0}.hs-featured-image{float:right;margin:0 0 20px 20px;max-width:50%}@media (max-width: 568px){.hs-featured-image{float:none;margin:0;width:100%;max-width:100%}}.hs-screen-reader-text{clip:rect(1px, 1px, 1px, 1px);height:1px;overflow:hidden;position:absolute !important;width:1px}
+</style>
+
+    
+
+    
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="dP6XQG_0Vpt0pWnM9wmmpP-Bh50PV2_nw2-H-NQWOYc">
+
+<!-- Hotjar Tracking Code for www.fairwinds.com -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1674931,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+<!-- SalesLoft Live Website Tracking -->
+<script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['SLScoutObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://scout-cdn.salesloft.com/sl.js','slscout');
+    slscout(["init", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0IjoxMDE4MTh9.6cDka0AL_9XX44Fv72plP0p0DRM9-jmZ8Bl0f30J6oU"]);
+</script>
+<!-- End of SalesLoft Live Website Tracking -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '521127644762074');
+  fbq('track', 'PageView');
+</script>
+<noscript>&lt;img  height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=521127644762074&amp;amp;ev=PageView&amp;amp;noscript=1"&gt;</noscript>
+<!-- End Facebook Pixel Code -->
+<!-- Facebook Domain Verification -->
+<meta name="facebook-domain-verification" content="z4hjhltqx9yuzxogimauahe893iud0">
+<!-- End Facebook Domain Verification -->
+<link rel="amphtml" href="https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes?hs_amp=true">
+
+<meta property="og:image" content="https://www.fairwinds.com/hubfs/Rock%20formations%20-%20How%20to%20Deploy%20a%20Multi-tiered%20Web%20Application%20with%20Kubernetes.jpg#keepProtocol">
+<meta property="og:image:width" content="4077">
+<meta property="og:image:height" content="2548">
+<meta property="og:image:alt" content="Rock formation - How to deploy a multi-tiered web application with Kubernetes">
+<meta name="twitter:image" content="https://www.fairwinds.com/hubfs/Rock%20formations%20-%20How%20to%20Deploy%20a%20Multi-tiered%20Web%20Application%20with%20Kubernetes.jpg#keepProtocol">
+<meta name="twitter:image:alt" content="Rock formation - How to deploy a multi-tiered web application with Kubernetes">
+
+<meta property="og:url" content="https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="canonical" href="https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes">
+
+<meta property="og:type" content="article">
+<link rel="alternate" type="application/rss+xml" href="https://www.fairwinds.com/blog/rss.xml">
+<meta name="twitter:domain" content="www.fairwinds.com">
+<meta name="twitter:site" content="@fairwindsops">
+<script src="//platform.linkedin.com/in.js" type="text/javascript">
+    lang: en_US
+</script>
+
+<meta http-equiv="content-language" content="en">
+<link rel="stylesheet" href="//cdn2.hubspot.net/hub/7052064/hub_generated/template_assets/1629274824351/hubspot/hubspot_default/shared/responsive/layout.min.css">
+
+
+
+
+
+    
+<!-- Add Google Optimize Flash In Prevention Here -->
+<!-- Add Google Tag Manager Script Tag Here -->
+
+<!-- Prevent style flash in on Firefox -->
+<style>html {display: none; opacity: 0;}</style>
+
+<!-- Attach main CSS -->
+<link href="https://www.fairwinds.com/hs-fs/hub/2184645/hub_generated/template_assets/24204950227/1627665348686/unified3/styles/styles.min.css" rel="stylesheet">
+
+<!-- Attach secondary styles -->
+<link href="https://www.fairwinds.com/hs-fs/hub/2184645/hub_generated/template_assets/21132870030/1590777389122/unified3/styles/fairwinds.min.css" rel="stylesheet">
+
+
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TM95WXQ');</script>
+<!-- End Google Tag Manager -->
+
+
+
+<!-- Setup dynamic Blog Schema -->
+<script type="application/ld+json">
+ {
+     "@context": "http://schema.org",
+     "@type": "BlogPosting",blog-bl
+     "headline": "How to Deploy a Multi-Tier Web Application with Kubernetes",
+     "image": {
+          "@type": "ImageObject",
+          "url": "https://cdn2.hubspot.net/hubfs/2184645/Rock%20formations%20-%20How%20to%20Deploy%20a%20Multi-tiered%20Web%20Application%20with%20Kubernetes.jpg"
+     },
+     "datePublished": "2020-05-11 21:38:14",
+     "dateModified": "May 11, 2020, 21:40:35",
+     "author": {
+         "@type": "Person",
+         "name": "Danielle Cook"
+     },
+     "publisher": {
+         "@type": "Organization",
+         "name": "Fairwinds Ops, Inc",
+         "logo": {
+             "@type": "ImageObject",
+             "url": "https://cdn2.hubspot.net/hubfs/2184645/FW-Logo-Warm-Navy.svg"
+         }
+     },
+     "description": "Get a step-by-step guide on deploying a multi-tiered web application with a Redis backend in Kubernetes. Use the Fairwinds workshop Git Repository."
+ }
+ </script>
+ <!-- End Schema --> 
+
+
+
+
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Override code block style for Google mobile check -->
+<style type="text/css">
+   @media (max-width: 580px) {
+    pre,code {
+      max-width: 100%;
+      border: none;
+      display: block;
+      white-space: pre;
+      overflow-x: auto;
+    }
+  }
+</style>
+
+    
+
+</head>
+<body class="u3t-blog-post   hs-content-id-29245093378 hs-blog-post hs-blog-id-21423861432" style="max-width:100%; overflow-x:hidden;">
+    <div class="header-container-wrapper">
+    <div class="header-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_162672251578424" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="Edit%20U3M%20Hero%20ttps://www.googletagmanager.com/ns.html?id=GTM-TM95WXQ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<section class="u3gm-header u3gm-header-v3 ">
+  <div class="inner-main">
+      <div class="utility-header">
+    <div class="inner">
+      <a class="header-item" href="https://fairwindscommunity.slack.com/" target="_blank">Support</a> 
+      <a class="header-item" href="https://insights.fairwinds.com/auth/login">Log in</a>
+      <a class="icon header-item" href="https://github.com/FairwindsOps" target="_blank"><span class="fab fa-github"></span></a>
+      <a class="icon header-item" href="https://fairwindscommunity.slack.com" target="_blank"><span class="fab fa-slack"></span></a>  
+    </div>
+  </div>
+    <div class="main-menu">
+  <div class="u3gm-header__logo"><a href="https://www.fairwinds.com/"><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlbk="http://www.w3.org/1999/xlink" x="0px" y="0px" viewbox="0 0 583.1 227.3" style="enable-background:new 0 0 583.1 227.3;" xml:space="preserve">
+<g>
+	<g>
+		<path class="st0" d="M120.9,91.9H48.8V68h84.4v11.6C133.2,86.4,127.7,91.9,120.9,91.9z" />
+		<path class="st0" d="M90.2,125.6H48.8v-23.9h53.7v11.6C102.5,120.1,97,125.6,90.2,125.6z" />
+		<path class="st0" d="M60.4,159.3H48.8v-23.9h23.9V147C72.6,153.8,67.1,159.3,60.4,159.3z" />
+	</g>
+	<g>
+		<path class="st0" d="M170.1,144.6V84.5H207v4.2c0,3.7-3,6.8-6.8,6.8h-18.4V109h16.6v3.5c0,4.1-3.3,7.5-7.5,7.5h-9.1v19.1
+			c0,3-2.5,5.5-5.5,5.5H170.1z" />
+		<path class="st0" d="M209.5,132.3c0-2,0.3-3.7,1-5.1c0.7-1.5,1.6-2.7,2.9-3.6c1.3-1,2.7-1.7,4.2-2.3c1.6-0.6,3.3-1,5.4-1.3l11.3-2
+			v-1.5c0-2-0.5-3.5-1.6-4.6c-1-1.1-2.6-1.6-4.5-1.6c-1.9,0-3.4,0.5-4.6,1.4c-1.2,1-1.8,2.2-1.8,3.8h-10.8c0.3-4.5,1.9-8.2,5.1-11
+			c3.1-2.8,7.2-4.3,12.3-4.3c5.3,0,9.5,1.3,12.6,4c3.1,2.7,4.7,6.6,4.7,11.8v28.6h-4.7c-2.8,0-5.1-2.1-5.5-4.8l-0.1-1.1
+			c-2.7,4.6-6.9,6.8-12.4,6.8c-3.9,0-7.1-1.2-9.6-3.6C210.8,139.6,209.5,136.4,209.5,132.3z M220.7,131.6c0,1.2,0.4,2.1,1.3,2.8
+			c0.9,0.7,2.1,1,3.7,1c1.4,0,2.7-0.3,3.9-0.9c1.2-0.6,2.2-1.5,3-2.7c1-1.4,1.5-3.2,1.5-5.3v-1.2l-8.7,1.8c-1.6,0.3-2.8,0.8-3.6,1.5
+			C221.1,129.4,220.7,130.3,220.7,131.6z" />
+		<path class="st0" d="M255.4,88.5c0-1.8,0.7-3.6,2-4.9c1.3-1.2,2.8-1.9,4.6-1.9c1.8,0,3.6,0.6,4.9,1.9c1.4,1.3,2.1,2.9,2.1,4.8
+			c0,1.9-0.7,3.4-2,4.7c-1.3,1.3-2.9,1.9-4.8,1.9c-1.9,0-3.5-0.6-4.8-1.9C256.1,91.8,255.5,90.3,255.4,88.5z M256.6,144.6v-43.5
+			h11.2v38c0,3-2.5,5.5-5.5,5.5H256.6z" />
+		<path class="st0" d="M278.8,144.6v-43.5h9.6l1.1,6.8c0.8-2.1,2.3-3.9,4.4-5.2c2.1-1.4,4.9-2.1,8.3-2.1v11c-3.5,0-6.4,0.9-8.6,2.6
+			c-2.2,1.7-3.4,4.4-3.5,8.1v16.7c0,3-2.5,5.5-5.5,5.5H278.8z" />
+		<path class="st0" d="M308,101.1h11.9l6.6,26.1l0.8,4.6l1-4.6l7.4-26.1h9.9l7.4,26.1l0.9,4.6l0.8-4.6l6.7-26.1h11.9l-11.9,39.4
+			c-0.7,2.4-3,4.1-5.5,4.1h-7.5l-7.9-25.6l-7.1,21.6c-0.8,2.3-3,3.9-5.4,3.9H321L308,101.1z" />
+		<path class="st0" d="M378.9,88.3c0-1.8,0.7-3.4,2-4.7c1.3-1.3,2.9-1.9,4.8-1.9c1.8,0,3.4,0.6,4.8,1.9c1.3,1.3,2,2.8,2,4.7
+			c0,1.9-0.7,3.4-2,4.7c-1.3,1.3-2.9,1.9-4.8,1.9c-1.9,0-3.5-0.6-4.8-1.9C379.6,91.8,378.9,90.2,378.9,88.3z M380.1,144.6v-43.5
+			h11.2v38c0,3-2.5,5.5-5.5,5.5H380.1z" />
+		<path class="st0" d="M403.2,144.6v-43.5h9.6l0.9,5.8c1.1-2,2.6-3.6,4.6-4.9c2-1.2,4.4-1.9,7.2-1.9c4.5,0,8,1.4,10.4,4.3
+			c2.4,2.9,3.6,6.8,3.6,11.9v22.5c0,3.2-2.6,5.7-5.7,5.7h-5.5V119c0-2.5-0.5-4.5-1.6-5.8c-1-1.3-2.6-2-4.6-2c-2.3,0-4.1,0.9-5.5,2.7
+			c-1.4,1.8-2.2,4.4-2.2,7.9v17.1c0,3.2-2.6,5.7-5.7,5.7H403.2z" />
+		<path class="st0" d="M447.5,122.8c0-6.4,1.9-11.8,5.7-16.1c3.8-4.3,8.7-6.5,14.5-6.5c2.9,0,5.5,0.5,7.8,1.6c2.3,1.1,4,2.4,5.2,4.1
+			V82h11.2v62.6h-4.8c-2.7,0-5-2-5.4-4.7l-0.2-1.2c-3.1,4.5-7.7,6.8-13.9,6.8c-3.8,0-7.3-1-10.4-3c-3.1-2-5.5-4.7-7.2-8.2
+			C448.3,130.9,447.5,127,447.5,122.8z M458.9,122.8c0,3.7,1,6.6,3.1,8.9c2.1,2.3,4.7,3.4,7.8,3.4c2.9,0,5.5-1.1,7.7-3.2
+			c2.2-2.2,3.3-5.1,3.3-8.8v-0.5c0-2.5-0.6-4.6-1.7-6.5c-1.1-1.9-2.5-3.2-4.1-4.1c-1.6-0.9-3.4-1.3-5.2-1.3c-3.1,0-5.7,1.1-7.8,3.4
+			S458.9,119.2,458.9,122.8z" />
+		<path class="st0" d="M500.6,131.4h6.9c2,0,3.7,1.2,4.8,2.9c0.2,0.4,0.6,0.7,0.9,1c1.1,0.9,2.6,1.4,4.5,1.4c1.7,0,3-0.4,4-1.1
+			c0.9-0.7,1.4-1.8,1.4-3c0-1.4-0.5-2.5-1.6-3.3c-1.1-0.8-3.2-1.5-6.2-2.1c-4.8-0.8-8.3-2.3-10.5-4.4c-2.3-2.1-3.4-4.9-3.4-8.5
+			c0-4,1.4-7.4,4.2-10.1c2.8-2.7,6.8-4.1,11.9-4.1c4.6,0,8.4,1.3,11.3,3.8c2.9,2.5,4.5,5.8,4.7,9.9h-11.1c-0.1-3.3-1.7-5-5-5
+			c-1.5,0-2.7,0.4-3.5,1.2c-0.8,0.8-1.3,1.8-1.3,3.1c0,1.4,0.5,2.4,1.6,3.1c1.1,0.7,3.1,1.3,6,1.8c5.1,0.9,8.8,2.4,10.9,4.5
+			c2.2,2.1,3.2,5,3.2,8.7c0,2.4-0.4,4.5-1.3,6.4c-0.9,1.8-2.1,3.3-3.7,4.4c-1.6,1.1-3.3,2-5.3,2.5c-2,0.6-4.1,0.8-6.5,0.8
+			c-5.3,0-9.4-1.3-12.3-3.8C502.3,139.2,500.7,135.8,500.6,131.4z" />
+	</g>
+</g>
+</svg>
+</a></div>
+  <div class="u3gm-header__menu new-2021"><span id="hs_cos_wrapper_module_162672251578424_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_162672251578424_" class="hs-menu-wrapper active-branch flyouts hs-menu-flow-horizontal" role="navigation" data-sitemap-name="default" data-menu-id="49343366454" aria-label="Navigation Menu">
+ <ul role="menu" class="active-branch">
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem"><span class="two-col">Software</span></a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights" role="menuitem"><span class="top-item left-col">Fairwinds Insights</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights-features" role="menuitem"><span class="left-col">Features</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-insights-schedule-demo" role="menuitem"><span class="left-col">Demo</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.docs.fairwinds.com/" role="menuitem"><span class="left-col">Documentation</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.fairwinds.com/auth/login" role="menuitem"><span class="left-col">Login</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.fairwinds.com/orgs/centaurus/clusters" role="menuitem"><span class="left-col">Sandbox</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/blog/kubernetes-support" role="menuitem"><span class="left-col end-col">Support</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/open-source-software" role="menuitem"><span class="top-item right-col">Open Source</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/polaris" role="menuitem"><span class="right-col">Polaris</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-polaris-upgrade" role="menuitem"><span class="right-col">Polaris Upgrade</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/elements" role="menuitem"><span class="right-col">Fairwinds Elements</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/open-source-software-user-group" role="menuitem"><span class="right-col">Open Source User Group</span></a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem"><span class="two-col">Solutions</span></a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights" role="menuitem"><span class="top-item left-col">Overview</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security" role="menuitem"><span class="left-col">Kubernetes Security</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/enforce-kubernetes-policy" role="menuitem"><span class="left-col">Policy Enforcement</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-compliance" role="menuitem"><span class="left-col">Governance and Compliance</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-cost-optimization" role="menuitem"><span class="left-col">Cost Optimization</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/cloud-native-service-ownership" role="menuitem"><span class="left-col end-col">Service Ownership</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops" role="menuitem"><span class="top-item right-col">Managed Kubernetes</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-audit-improve" role="menuitem"><span class="right-col">Audit and Improve</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops-advisory" role="menuitem"><span class="right-col">Kubernetes Advisory</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubestart" role="menuitem"><span class="right-col">Kubernetes Quick Start</span></a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1" role="none"><a href="https://www.fairwinds.com/customer-stories" role="menuitem">Customers</a></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">About</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/who-is-fairwinds" role="menuitem">Company</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/meet-the-team" role="menuitem">Team</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/careers" role="menuitem">Careers</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-news" role="menuitem">News</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/blog/kubernetes-support" role="menuitem">Support</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children active-branch" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Resources</a>
+   <ul role="menu" class="hs-menu-children-wrapper active-branch">
+    <li class="hs-menu-item hs-menu-depth-2 active active-branch" role="none"><a href="https://www.fairwinds.com/blog" role="menuitem">Blog</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/resource-library" role="menuitem">Library</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security-best-practices" role="menuitem">K8S Security Resources</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-maturity-model" role="menuitem">Kubernetes Maturity Model</a></li>
+   </ul></li>
+ </ul>
+</div></span></div>
+  <div class="u3gm-header__cta"><span id="hs_cos_wrapper_module_162672251578424_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_cta" style="" data-hs-cos-general-type="widget" data-hs-cos-type="cta"><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" id="hs-cta-wrapper-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><span class="hs-cta-node hs-cta-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03" id="hs-cta-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><!--[if lte IE 8]><div id="hs-cta-ie-element"></div><![endif]--><a href="https://cta-redirect.hubspot.com/cta/redirect/2184645/2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><img class="hs-cta-img" id="hs-cta-img-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03" style="border-width:0px;" src="https://no-cache.hubspot.com/cta/default/2184645/2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03.png" alt="Start Trial"></a></span><script charset="utf-8" src="/hs/cta/cta/current.js"></script><script type="text/javascript"> hbspt.cta._relativeUrls=true;hbspt.cta.load(2184645, '2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03', {"region":"na1"}); </script></span><!-- end HubSpot Call-to-Action Code --></span></div>
+  <button class="u3gm-header__hamburger-toggle x2"><span class="lines"></span></button>
+  <div class="u3gm-header__offscreen-menu">
+    <div class="content">
+      <div class="mobile-menu"><span id="hs_cos_wrapper_module_162672251578424_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_162672251578424_" class="hs-menu-wrapper active-branch no-flyouts hs-menu-flow-vertical" role="navigation" data-sitemap-name="default" data-menu-id="49343366454" aria-label="Navigation Menu">
+ <ul role="menu" class="active-branch">
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem"><span class="two-col">Software</span></a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights" role="menuitem"><span class="top-item left-col">Fairwinds Insights</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights-features" role="menuitem"><span class="left-col">Features</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-insights-schedule-demo" role="menuitem"><span class="left-col">Demo</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.docs.fairwinds.com/" role="menuitem"><span class="left-col">Documentation</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.fairwinds.com/auth/login" role="menuitem"><span class="left-col">Login</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.fairwinds.com/orgs/centaurus/clusters" role="menuitem"><span class="left-col">Sandbox</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/blog/kubernetes-support" role="menuitem"><span class="left-col end-col">Support</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/open-source-software" role="menuitem"><span class="top-item right-col">Open Source</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/polaris" role="menuitem"><span class="right-col">Polaris</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-polaris-upgrade" role="menuitem"><span class="right-col">Polaris Upgrade</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/elements" role="menuitem"><span class="right-col">Fairwinds Elements</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/open-source-software-user-group" role="menuitem"><span class="right-col">Open Source User Group</span></a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem"><span class="two-col">Solutions</span></a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights" role="menuitem"><span class="top-item left-col">Overview</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security" role="menuitem"><span class="left-col">Kubernetes Security</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/enforce-kubernetes-policy" role="menuitem"><span class="left-col">Policy Enforcement</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-compliance" role="menuitem"><span class="left-col">Governance and Compliance</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-cost-optimization" role="menuitem"><span class="left-col">Cost Optimization</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/cloud-native-service-ownership" role="menuitem"><span class="left-col end-col">Service Ownership</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops" role="menuitem"><span class="top-item right-col">Managed Kubernetes</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-audit-improve" role="menuitem"><span class="right-col">Audit and Improve</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops-advisory" role="menuitem"><span class="right-col">Kubernetes Advisory</span></a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubestart" role="menuitem"><span class="right-col">Kubernetes Quick Start</span></a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1" role="none"><a href="https://www.fairwinds.com/customer-stories" role="menuitem">Customers</a></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">About</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/who-is-fairwinds" role="menuitem">Company</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/meet-the-team" role="menuitem">Team</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/careers" role="menuitem">Careers</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-news" role="menuitem">News</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/blog/kubernetes-support" role="menuitem">Support</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children active-branch" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Resources</a>
+   <ul role="menu" class="hs-menu-children-wrapper active-branch">
+    <li class="hs-menu-item hs-menu-depth-2 active active-branch" role="none"><a href="https://www.fairwinds.com/blog" role="menuitem">Blog</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/resource-library" role="menuitem">Library</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security-best-practices" role="menuitem">K8S Security Resources</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-maturity-model" role="menuitem">Kubernetes Maturity Model</a></li>
+   </ul></li>
+ </ul>
+</div></span></div>
+      <div class="mobile-cta"><span id="hs_cos_wrapper_module_162672251578424_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_cta" style="" data-hs-cos-general-type="widget" data-hs-cos-type="cta"><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" id="hs-cta-wrapper-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><span class="hs-cta-node hs-cta-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03" id="hs-cta-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><!--[if lte IE 8]><div id="hs-cta-ie-element"></div><![endif]--><a href="https://cta-redirect.hubspot.com/cta/redirect/2184645/2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03"><img class="hs-cta-img" id="hs-cta-img-2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03" style="border-width:0px;" src="https://no-cache.hubspot.com/cta/default/2184645/2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03.png" alt="Start Trial"></a></span><script charset="utf-8" src="/hs/cta/cta/current.js"></script><script type="text/javascript"> hbspt.cta._relativeUrls=true;hbspt.cta.load(2184645, '2fa8f008-6f0c-43d9-8a4f-5536b8ba1e03', {"region":"na1"}); </script></span><!-- end HubSpot Call-to-Action Code --></span></div>
+    </div>
+  </div>        
+  </div>
+  </div>
+</section></div>
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end header -->
+</div><!--end header wrapper -->
+
+<div class="body-container-wrapper">
+    <div class="body-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-cell " style="" data-widget-type="cell" data-x="0" data-w="12">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-2 ">
+<div class="row-fluid ">
+<section class="u3gm-blog-post">
+<!-- Blog Post Hero -->
+<div class="u3gm-blog-post__title__container">
+  <h1 class="title">
+    <span id="hs_cos_wrapper_name" class="hs_cos_wrapper hs_cos_wrapper_meta_field hs_cos_wrapper_type_text" style="" data-hs-cos-general-type="meta_field" data-hs-cos-type="text">How to Deploy a Multi-Tier Web Application with Kubernetes</span>
+  </h1>  
+  <div class="avatar" style="background-image:url(https://www.fairwinds.com/hubfs/Blog%20Images/Headshot.jpg)">    
+  </div>
+  <div class="u3gm-blog-post__author__container">
+     <div class="publish-date">
+       11 May, 2020 
+     </div> <span style="padding-left: 5px">| by </span>
+    <div class="name"><a href="https://www.fairwinds.com/blog/author/danielle-cook">Danielle Cook</a></div>  
+
+</div>
+</div>
+
+<!-- Featured Image -->
+  
+  
+<!-- End Featured Image -->
+
+<!-- Blog Post Body -->
+<div class="u3gm-blog-post__body">
+    <ul class="js-share share-list">
+    <li>
+      <a class="js-share-trigger is-mouse-focused" href="http://www.facebook.com/share.php?u=https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes" aria-label="Share on facebook" data-share-platform="facebook" target="_blank" rel="noopener">
+        <i class="icon icon--ui__facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 9.723 20" id="facebook"><path d="M6.055 7.236V4.768c0-.932.196-1.492 1.414-1.492 1.125 0 2.156.01 2.156.01L9.706.131a20.557 20.557 0 0 0-2.38-.13C3.948 0 2.483 2.081 2.483 4.35v2.885H0v3.378h2.483V20h3.572v-9.386h3.508l.159-3.378z" fill="currentColor"></path></svg>        </i>
+      </a>
+    </li>
+    <li>
+      <a class="js-share-trigger" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes" aria-label="Share on linked in" data-share-platform="linkedin" target="_blank" rel="noopener">
+        <i class="icon icon--ui__linkedin">
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 19.083" id="linkedin"><path d="M3.866 5.648H.334v13.435h3.532zm.336-3.561A2.091 2.091 0 0 0 2.087 0 2.084 2.084 0 0 0 0 2.087a2.101 2.101 0 1 0 4.202 0M20 19.083V9.597c0-2.614-1.419-4.283-4.396-4.283a6.284 6.284 0 0 0-4.701 2.058V5.648H7.37v13.435h3.533v-9.067a3.925 3.925 0 0 1 3.061-1.558 2.178 2.178 0 0 1 2.474 2.502v8.123z" fill="currentColor"></path></svg>        </i>
+      </a>
+    </li>
+    <li>
+      <a class="js-share-trigger" href="https://twitter.com/intent/tweet?original_referer=https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes&amp;url=https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes&amp;source=tweetbutton" aria-label="Share on twitter" data-share-platform="twitter" target="_blank" rel="noopener">
+        <i class="icon icon--ui__twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 16.244" id="twitter"><path d="M13.363.004V0h.938l.342.069a3.645 3.645 0 0 1 .623.175 4.502 4.502 0 0 1 .541.252 5.115 5.115 0 0 1 .474.294 2.914 2.914 0 0 1 .38.314.524.524 0 0 0 .516.086 6.934 6.934 0 0 0 .758-.225c.27-.096.538-.204.802-.325q.398-.18.484-.229l.09-.054.003-.005.018-.009.018-.009.018-.009.018-.009.004-.006.005-.003.006-.004.003-.005.02-.006.017-.003-.004.027-.005.027-.009.027-.01.027-.009.018-.009.018-.009.027a.623.623 0 0 0-.018.072 3.075 3.075 0 0 1-.17.361 4.487 4.487 0 0 1-.407.64 3.097 3.097 0 0 1-.436.49c-.13.112-.216.19-.258.235a.816.816 0 0 1-.153.126l-.09.059-.019.009-.018.009-.003.006-.006.003-.005.004-.004.005-.018.009-.018.009-.003.006-.006.003-.005.004-.004.005-.003.006-.006.003-.005.004-.004.005h.09l.505-.108a8.995 8.995 0 0 0 .965-.261l.487-.162.054-.018.027-.009.018-.01.018-.009.018-.009.018-.009.037-.005.036-.004v.036l-.009.004-.009.006-.004.005-.005.004-.006.003-.003.006-.004.005-.005.004-.006.003-.003.006-.004.005-.006.004-.009.018-.009.018-.005.003-.229.307a2.45 2.45 0 0 1-.243.306q-.018.006-.05.054a4.985 4.985 0 0 1-.383.402 9.09 9.09 0 0 1-.689.626.856.856 0 0 0-.343.678 15.31 15.31 0 0 1-.04.905q-.037.504-.137 1.091a13.077 13.077 0 0 1-.306 1.325 12.127 12.127 0 0 1-.505 1.442 11.254 11.254 0 0 1-.622 1.262q-.325.558-.595.946-.271.388-.55.73-.28.344-.707.772-.43.427-.469.469c-.028.026-.146.125-.354.295q-.31.258-.667.516a7.673 7.673 0 0 1-.653.427c-.198.115-.438.245-.718.392a8.846 8.846 0 0 1-.905.411q-.487.189-1.028.351a9.415 9.415 0 0 1-1.046.253q-.505.09-1.145.153l-.64.063v.009H5.716v-.009l-.153-.009q-.153-.009-.252-.018t-.749-.099q-.65-.09-1.019-.181-.369-.09-1.1-.342a10.692 10.692 0 0 1-1.25-.51q-.517-.257-.649-.325a4.538 4.538 0 0 1-.292-.166l-.162-.099-.004-.005-.005-.004-.006-.003-.003-.006-.018-.009-.018-.009-.004-.005-.005-.004-.006-.003-.003-.006-.004-.005-.005-.004H0v-.036l.018.004.018.005.081.009c.054.006.201.015.442.027.24.012.496.012.766 0a8.083 8.083 0 0 0 .83-.081 9.409 9.409 0 0 0 1.001-.216 7.47 7.47 0 0 0 1.06-.365q.482-.212.685-.317a6.492 6.492 0 0 0 .617-.382l.415-.279.003-.006.006-.003.005-.004.004-.005.004-.006.005-.004.005-.003.004-.006.018-.005.018-.004.004-.018.005-.018.005-.003.004-.006-.144-.009-.28-.018a2.735 2.735 0 0 1-.424-.081 4.104 4.104 0 0 1-.622-.216 4.694 4.694 0 0 1-.649-.343 3.187 3.187 0 0 1-.456-.33 7.699 7.699 0 0 1-.36-.367 3.573 3.573 0 0 1-.383-.493 4.353 4.353 0 0 1-.31-.582l-.15-.328-.009-.027-.009-.027-.006-.018-.003-.018.027.003.027.006.198.027a4.42 4.42 0 0 0 .622.018 4.852 4.852 0 0 0 .587-.036q.162-.027.198-.036l.036-.009.045-.009.045-.009.004-.006.005-.003.006-.004.003-.005-.036-.009-.036-.009-.036-.009-.036-.009-.036-.009q-.036-.009-.126-.036a6.554 6.554 0 0 1-.487-.199 3.692 3.692 0 0 1-.63-.333 4.391 4.391 0 0 1-.449-.355 5.108 5.108 0 0 1-.463-.502 3.537 3.537 0 0 1-.45-.712 4.387 4.387 0 0 1-.299-.775 4.21 4.21 0 0 1-.129-.748l-.033-.379.018.004.018.005.018.009.018.009.018.009.018.009.28.127a3.532 3.532 0 0 0 .694.216c.277.06.442.093.496.099l.081.009h.163l-.004-.005-.005-.004-.006-.003-.004-.006-.003-.005-.006-.004-.005-.004-.004-.005-.018-.009-.018-.009-.003-.005-.006-.004-.005-.004-.004-.005-.018-.009-.018-.009-.003-.005-.155-.116a2.358 2.358 0 0 1-.31-.294q-.163-.18-.325-.378a2.964 2.964 0 0 1-.289-.424 5.17 5.17 0 0 1-.267-.573 4.13 4.13 0 0 1-.21-.698 3.974 3.974 0 0 1-.082-.694 4.378 4.378 0 0 1 .018-.586 3.861 3.861 0 0 1 .108-.55 4.45 4.45 0 0 1 .235-.649l.153-.342.01-.027L1.36.74l.006-.004.003-.005.004-.006.005-.003.006.003.003.006.004.005.005.004.006.003.003.006.004.005.005.004.01.018.008.018.006.003.003.006.244.27c.162.18.354.382.577.604a3.313 3.313 0 0 0 .37.346.265.265 0 0 1 .09.083 3.572 3.572 0 0 0 .36.319q.308.252.803.586.497.333 1.1.658a10.607 10.607 0 0 0 1.3.586q.692.261.972.343c.187.054.505.123.956.207s.791.138 1.02.162c.228.024.384.038.468.042l.126.003-.003-.027-.006-.027-.036-.225a4.244 4.244 0 0 1-.036-.631 4.134 4.134 0 0 1 .063-.748A4.304 4.304 0 0 1 10 2.66a3.64 3.64 0 0 1 .247-.565 5.265 5.265 0 0 1 .321-.481 3.837 3.837 0 0 1 .514-.559 3.797 3.797 0 0 1 .721-.514 4.727 4.727 0 0 1 .748-.342 3.616 3.616 0 0 1 .578-.154 1.966 1.966 0 0 0 .234-.041" fill="currentColor"></path></svg>        </i>
+      </a>
+    </li>
+    <li>
+      <a class="js-share-trigger" href="https://plus.google.com/share?url=https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes" aria-label="Share on google+">
+        <i class="icon icon--ui__google">
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 17.014" id="google"><path d="M20 4.137v-.551h-3.033V0h-1.104v3.586h-3.585v.551h3.585v3.586h1.104V4.137zM9.827 1.104L11.006 0H5.733C3.367 0 1.142 1.784 1.142 3.859A3.808 3.808 0 0 0 5.16 7.685c.166 0 .33-.005.49-.017a2.141 2.141 0 0 0-.269.984 2.045 2.045 0 0 0 .718 1.458c-.302 0-.595.007-.916.007C2.257 10.117 0 11.983 0 13.916c0 1.905 2.473 3.098 5.402 3.098 3.338 0 5.183-1.895 5.183-3.799A3.675 3.675 0 0 0 8.74 9.787c-.477-.338-1.388-1.158-1.388-1.641 0-.566.162-.844 1.013-1.51a3.297 3.297 0 0 0 1.488-2.62c0-1.326-.592-2.637-1.7-2.912zm-2.772 9.714c1.098.766 1.888 1.196 2.109 2.066a2.37 2.37 0 0 1 .066.545c0 1.538-.994 2.744-3.84 2.744-2.023 0-3.485-1.282-3.485-2.823 0-1.507 1.812-2.765 3.837-2.743a4.502 4.502 0 0 1 1.313.211M5.923 7.145C4.565 7.102 3.272 5.623 3.039 3.84 2.806 2.055 3.717.69 5.074.73c1.358.041 2.651 1.472 2.884 3.255.236 1.786-.675 3.198-2.035 3.16" fill="currentColor"></path></svg>        </i>
+      </a>
+    </li>
+    <li>
+      <a class="" href="mailto:?subject=Check%20out%20https://www.fairwinds.com/blog/how-to-deploy-multi-tiered-web-application-with-kubernetes" aria-label="Share by email" data-share-platform="email" title="IaaM - Infrastructure as a Motorcycle" target="_blank" rel="noopener">
+        <i class="icon icon--ui__email">
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 23.457 17.1" id="email"><path d="M21.756 13.922c-1.63-1.63-2.905-2.949-4.522-4.567a7.727 7.727 0 0 1-.76-.716c-.008-.188 1.309-1.309 1.477-1.477 1.521-1.52 3.067-3.096 4.522-4.566.037-.008.042.018.044.045.163 3.199.089 6.97.089 10.475a4.083 4.083 0 0 1-.089 1.388c-.117.123-.662-.483-.761-.582m-5.596 2.283H7.297c-2.196 0-4.613.336-5.731-.627 2.072-2.212 4.257-4.309 6.402-6.446.478.463 1.107 1.062 1.746 1.701.699.699 1.433 2.047 2.686 1.656.644-.201 1.222-1.043 1.745-1.567.23-.229.507-.462.851-.805.198-.198.698-.847.806-.851.095-.004.591.546.806.761 1.327 1.327 2.577 2.621 3.895 3.94a9.442 9.442 0 0 1 1.477 1.566c-1.041 1.016-3.625.672-5.82.672M.874 12.095A163.934 163.934 0 0 1 .82 4.729c.001-.566.018-1.109.062-1.62l.013-.155a4.214 4.214 0 0 1 .179-.716q3.14 3.083 6.223 6.222c-1.48 1.627-3.121 3.166-4.7 4.745a9.434 9.434 0 0 1-1.568 1.477l-.014-.116a20.771 20.771 0 0 1-.141-2.471M7.342.895h8.863c1.544 0 3.067-.139 4.432 0a2.639 2.639 0 0 1 1.432.761c-2.826 2.924-5.778 5.868-8.729 8.819-.276.275-.98 1.153-1.343 1.164-.407.012-1.036-.857-1.388-1.209C7.644 7.465 4.53 4.453 1.656 1.432 2.79.602 5.159.895 7.342.895m16.115 13.743l-.045-12.355A3.334 3.334 0 0 0 20.816 0H2.686A3.29 3.29 0 0 0 0 2.685v11.684A3.268 3.268 0 0 0 2.686 17.1h18.13a3.277 3.277 0 0 0 2.641-2.462" fill="currentColor"></path></svg>        </i>
+      </a>
+    </li>
+  </ul>
+  <div class="content"><span id="hs_cos_wrapper_post_body" class="hs_cos_wrapper hs_cos_wrapper_meta_field hs_cos_wrapper_type_rich_text" style="" data-hs-cos-general-type="meta_field" data-hs-cos-type="rich_text"><p>In the final introduction to Kubernetes series, we’ll take you through how to deploy a multi-tiered web application. The webapp is a key value storage and retrieval service with a Redis backend. (Read <a href="/blog/what-problems-does-kubernetes-solve" rel=" noopener">problems Kubernetes solves</a>, <a href="/blog/getting-started-with-kubernetes-architecture-basics-definitions" rel=" noopener">architecture and definitions</a> or <a href="/blog/how-to-build-a-kubernetes-cluster-in-gke" rel=" noopener">building a K8S cluster in GKE</a>).</p>
+<!--more-->
+<p>Here’s a quick overview of what we will deploy:</p>
+<p><img src="https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=836&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png" alt="Fairwinds Multi-tiered web application with Kubernetes diagram" width="836" style="width: 836px;" srcset="https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=418&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 418w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=836&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 836w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=1254&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 1254w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=1672&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 1672w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=2090&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 2090w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png?width=2508&amp;name=Fairwinds%20Multi-tiered%20web%20application%20with%20Kubernetes%20diagram.png 2508w" sizes="(max-width: 836px) 100vw, 836px"></p>
+<p>We’ve prepared a <a href="https://github.com/FairwindsOps/k8s-workshop">GitHub repository</a> that you can clone with all the Kubernetes repository stores, various docs and code Fairwinds uses for workshops.&nbsp;</p>
+<p>Go to Git &gt; clone or download &gt; copy the URL.&nbsp;</p>
+<p><img src="https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=975&amp;name=Fairwinds%20GitHub%20k8s-workshop.png" alt="Fairwinds GitHub k8s-workshop" width="975" style="width: 975px;" srcset="https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=488&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 488w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=975&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 975w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=1463&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 1463w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=1950&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 1950w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=2438&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 2438w, https://www.fairwinds.com/hs-fs/hubfs/Fairwinds%20GitHub%20k8s-workshop.png?width=2925&amp;name=Fairwinds%20GitHub%20k8s-workshop.png 2925w" sizes="(max-width: 975px) 100vw, 975px"></p>
+<p>You’ll need to have a Kubernetes cluster. You can check out our blog on <a href="/blog/how-to-build-a-kubernetes-cluster-in-gke" rel=" noopener">how to build a Kubernetes Cluster with GKE</a>. In GKE, open your cloud shell terminal window then run the command:&nbsp;<code></code></p>
+<p style="font-size: 16px;"><code>git clone <a href="https://github.com/FairwindsOps/k8s-workshop.git" rel=" noopener">https://github.com/FairwindsOps/k8s-workshop.git</a></code></p>
+<p>It’s a relatively small project so will pull down quickly.&nbsp;</p>
+<p>Within the repository, you’ll find a README, assembly required folder, complete folder, images folder and istio folder. For the purposes of this blog, you can ignore all except the README and the complete folders. There are two tracks available in the README. We’ll focus on the basic track, however if you want to dig into problems that could arise when you deploy an application to Kubernetes, you can go back to look at thekub assembly required version of this. It provides more nuance to the Kubernetes YAML that allows you to debug and test your ability to run kubectl commands.</p>
+<p>Below are the steps that we'll be using to deploy a complete web app. This blog will deploy a broken application and we'll be fixing the Kubernetes YAML documents to make the deployment successful.</p>
+<h2 style="font-size: 36px;">Deploy a Redis Database</h2>
+<p>In this workshop, you will:</p>
+<ul style="font-size: 18px;">
+<li>Deploy a new namespace for your application</li>
+<li>Deploy a Redis server into the new namespace</li>
+<li>Review the objects that you’ve deployed with Kubernetes (deployments, pods)</li>
+<li>Get logs from the deployed resources via kubectl</li>
+</ul>
+<p>You’ll first need to provision a namespace. A namespace is a way to segment and bucket objects that you're provisioning in the Kubernetes API. You can check the existing namespaces by running:&nbsp;<code></code></p>
+<p style="font-size: 16px;"><code>kubectl get namespace</code></p>
+<pre><code>danielle@cloudshell:~ (trial-275916)$ kubectl get namespace
+NAME              STATUS   AGE
+default           Active   75m
+kube-node-lease   Active   75m
+kube-public       Active   75m
+kube-system       Active   75m
+</code></pre>
+<p><span style="background-color: transparent; font-size: 18px;">In GKE, there are four existing namespaces you can see - default, kube-node-lease, kube-public and kube-system. We are going to create a new namespace: </span></p>
+<p><code style="font-size: 1.6rem;">kubectl apply -f namespace.yml</code></p>
+<p><span style="background-color: transparent; font-size: 18px;">The </span><code style="font-size: 1.6rem;">-f</code><span style="background-color: transparent; font-size: 18px;"> flag signifies you’re going to pass a file to </span><code style="font-size: 1.6rem;">kubectl</code><span style="background-color: transparent; font-size: 18px;"> for it to submit to the Kubernetes API. </span></p>
+<pre><code>danielle@cloudshell:~ (trial-275916)$ kubectl apply -f namespace.yml
+namespace/k8s-workshop created
+</code></pre>
+<p><span style="background-color: transparent; font-size: 18px;">You can run your get namespace command to see what you’ve created.</span></p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl get namespaces
+NAME              STATUS   AGE
+default           Active   81m
+k8s-workshop      Active   73s
+kube-node-lease   Active   81m
+kube-public       Active   81m
+kube-system       Active   81m</code></pre>
+<p>As you move forward, you’ll apply and submit objects to the Kubernetes API all in YAML definition. We will use the <code>kubectl</code> command line tool to take files, parse them and submit to the API.</p>
+<h2 style="font-size: 36px; font-weight: bold;">First Tier Web Application: Redis</h2>
+<p>You’ll now deploy the first tier of the web application starting with your stateful back-end that stores state for the webapp. kubectl allows you to take a series of YAML files, put them in a folder and <code>run kubectl apply -f</code> against an entire folder. It will provision all of the resources and objects defined underneath the folder. This allows you to create a grouping of objects and mini-YAML files instead of having a single YAML file with a thousand lines defining everything. You’ll first roll out the back-end tier of this multi-tier web application - an HA Redis implementation. To have a look around, you can run<code>ls -l 01_redis/</code></p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ ls -1 01_redis/
+redis.networkpolicy.yml
+redis-primary.deployment.yml
+redis-primary.service.yml
+redis-replica.deployment.yml
+redis-replica.horizontal_pod_autoscaler.yml
+redis-replica.service.yml</code></pre>
+<p>There is a sequence of files under this.&nbsp;</p>
+<ul>
+<li>
+<p>The deployment file defines the number of pods that are spun up (refer back to Kubernetes architecture basics and definitions for more info).&nbsp;</p>
+</li>
+<li>
+<p>You’ll see the service file that will define a clusterIP service (clusterIP because you don’t want Redis exposed to the public internet).&nbsp;</p>
+</li>
+<li>
+<p>This is a HA Redis implementation so you will have a deployment file for your replica and a horizontal pod autoscaler (HPA) for your replica. The autoscaler allows you to automatically scale based on resource requests that are set on the deployment.</p>
+</li>
+<li>
+<p>You also have a service available for the replica so the master can talk to the replica and a network policy for redis.&nbsp;</p>
+</li>
+</ul>
+<p>You can look into the files to see what the definitions look like. In your text editor, open the redis-primary deployment file:<code></code></p>
+<p style="font-size: 16px;"><code>vim redis.primary.deployment.yml</code></p>
+<p>You’ll see an API version to talk to, a kind (where you designated the object you will submit), the metadata, and a specification on what the deployment should look like.</p>
+<pre><code>apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-primary
+  namespace: k8s-workshop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: primary
+        tier: backend
+    spec:
+      containers:
+      - name: redis
+        image: gcr.io/google_containers/redis:e2e  # or just image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379 </code></pre>
+<p>In this case, you’ll provision one replica (i.e. one pod is part of the deployment). You’ll template out the spec you want in your template.spec. You can also define a set of containers. In this example, you’ll only have one container to spin up. The name of the container is Redis pulled from the Google Container Registry. You’ll aso make some resource requests that you’ll attach to the container—allocate 100 CPU shares, 100 MB of memory and networking to expose port 6379 which is redis default. You can dig around in the YAML definitions more and play with adding more containers or replicas.</p>
+<h2 style="font-size: 36px;"><strong>Apply YAML to Cluster</strong></h2>
+<p>You’ll now apply your YAML definitions to the cluster. Run:&nbsp;<code></code></p>
+<p style="font-size: 16px;"><code>kubectl apply -f 01_redis/</code></p>
+<p>This command went through all the files reviewed above and created objects for each one of them.&nbsp;</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl apply -f 01_redis/
+deployment.extensions/redis-primary created
+service/redis-primary created
+deployment.extensions/redis-replica created
+horizontalpodautoscaler.autoscaling/redis-replica created
+service/redis-replica created
+networkpolicy.networking.k8s.io/redis created</code></pre>
+<p>Now you’ll want to read those objects and get data on what’s running.&nbsp;</p>
+<p style="font-size: 16px;"><code>kubectl -n k8s-workshop get pod</code></p>
+<p>You’ll see you have two pods running - A Redis primary and replica.</p>
+<pre><code>NAME                             READY   STATUS    RESTARTS   AGE
+redis-primary-684c84fc56-57brt   1/1     Running   0          75s
+redis-replica-d64bd9565-zn7sg    1/1     Running   0          74s</code></pre>
+<p>Now take the same step for the deployments:</p>
+<p style="font-size: 16px;"><code>kubectl -n k8s-workshop get deployments</code></p>
+<p>You’ll see information about your deployments—the Redis replica, redis primary, the desired count of 1, current 1, up to date, what’s available and the age of the pod.</p>
+<pre><code>NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+redis-primary   1/1     1            1           2m37s
+redis-replica   1/1     1            1           2m36s</code></pre>
+<p>If you are doing a rolling deployment, you’ll see more interesting information here about the state of an application.</p>
+<p>You can also look at services by running:</p>
+<p style="font-size: 16px;"><code>kubectl -n k8s-workshop get services</code></p>
+<p>Here you can see the two services—the primary and replicas.</p>
+<pre><code>NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+redis-primary   ClusterIP   10.8.11.78           6379/TCP   5m35s
+redis-replica   ClusterIP   10.8.4.228           6379/TCP   5m34s</code></pre>
+<p>Both of these services are clusterIP services (i.e. only available on the IP that’s internal to the cluster). You’ll also see the IPs and some info on ports and age. If you wanted to summarize in a single command, you run:</p>
+<p style="font-size: 16px;"><code>kubectl -n k8s-workshop get deployments,pods,services</code></p>
+<p>This allows you to show all the resources in a single image.</p>
+<pre><code>NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.extensions/redis-primary   1/1     1            1           6m42s
+deployment.extensions/redis-replica   1/1     1            1           6m41s
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/redis-primary-684c84fc56-57brt   1/1     Running   0          6m42s
+pod/redis-replica-d64bd9565-zn7sg    1/1     Running   0          6m41s
+NAME                    TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+service/redis-primary   ClusterIP   10.8.11.78           6379/TCP   6m42s
+service/redis-replica   ClusterIP   10.8.4.228           6379/TCP   6m41s</code></pre>
+<p>Working through these steps, you should now see a healthy redis master and replica in the <span style="font-size: 16px;"><code>k8s-workshop namespace</code></span> in Kubernetes.</p>
+<h2><strong><span style="font-size: 36px;">Deploying the Web App </span></strong></h2>
+<p>Next you will:</p>
+<ul style="font-size: 18px;">
+<li>Deploy the web app into the <span style="font-size: 16px;"><code>default</code></span> namespace (A different namespace from the one we created above)</li>
+<li>Watch the Cloud Load Balancer create external access to the web app</li>
+<li>CURL the newly deployed web app to test manually</li>
+<li>Look at the logs of the web app</li>
+<li>Fix the broken web app deployment by deploying to the correct namespace</li>
+<li>CURL the web app again to test</li>
+</ul>
+<p>Start by doing a listing of the webapp directory <span style="font-size: 16px;"><code>ls -l 02_webapp/</code></span> to see that it has similar files to the redis backend.&nbsp;</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ ls -1 02_webapp/
+app.configmap.yml
+app.deployment.yml
+app.horizontal_pod_autoscaler.yml
+app.networkpolicy.yml
+app.secret.yml
+app.service.yml</code></pre>
+<p>There are two new object types: a configmap and a secret.&nbsp;</p>
+<ul style="font-size: 18px;">
+<li>A configmap offers ways to source environment variables and static files into your pod. If you look at the configmap YAML file, a hierarchical sequence of keys that you can drill into.&nbsp;</li>
+<li>A secret allows you to store and manage sensitive information, such as passwords, OAuth tokens, and ssh keys.</li>
+</ul>
+<p>To deploy the basic webapp:</p>
+<p><span style="font-size: 16px;"><code>kubectl apply -f 02_webapp/</code></span><code></code></p>
+<p>This deploys all the yaml definitions in the <code>02_webapp/</code> folder. Note that we are <i>not</i> defining the namespace in the <code>metadata</code> of the YAML, so it will default to the default namespace configured with <code>kubectl.</code></p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl apply -f 02_webapp/
+configmap/webapp created
+deployment.extensions/webapp created
+horizontalpodautoscaler.autoscaling/webapp created
+networkpolicy.networking.k8s.io/app created
+secret/webapp created
+service/webapp created</code></pre>
+<p>You can take a look at the configmap you created and are referencing in the deployment by running <code>kubectl -n k8s-workshop get configmaps </code> you’ll see that there are no resources found.</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl -n k8s-workshop get configmaps
+No resources found in k8s-workshop namespace.</code></pre>
+<p>In this intentional example, you’ll see an instance where a parameter was missed. You are looking at the default namespace and specifying the <code>k8s-workshop</code> namespace every time you deploy or to try to read information back.&nbsp;</p>
+<p>In this example, the <code>02_webapp/</code> implementation got deployed into the default namespace. To check this, run:&nbsp;</p>
+<code>kubectl get configmaps</code>
+<p>You’ll see that you have the webapp configmap in there, but it’s deployed to the wrong namespace.</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl get configmaps
+NAME     DATA   AGE
+webapp   2      4m8s</code></pre>
+<p>You’ll need to rerun the apply and specify the namespace. The reason is if you look at the <code>01_redis</code> primary deployment, you specified a namespace. If you look at the same deployment for webapp, you’ll see under metadata, you didn’t supply a namespace.</p>
+<p>You’ll need to back out the last apply with kubectl delete <code>-f 02_webapp/</code> to delete the objects created and correctly deploy into the k8s-workshop namespace.</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl delete -f 02_webapp/
+configmap "webapp" deleted
+deployment.extensions "webapp" deleted
+horizontalpodautoscaler.autoscaling "webapp" deleted
+networkpolicy.networking.k8s.io "app" deleted
+secret "webapp" deleted
+service "webapp" deleted</code></pre>
+<p>Now you’ll apply in the proper namespace.</p>
+<code>kubectl apply -f 02_webapp/ --namespace k8s-workshop</code>
+<p>This overrides the unset <code>default</code> namespace and deploys all the yaml files into the <span style="font-size: 16px;"><code>k8s-workshop</code></span> namespace.</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl apply -f 02_webapp/ --namespace k8s-workshop
+configmap/webapp created
+deployment.extensions/webapp created
+horizontalpodautoscaler.autoscaling/webapp created
+networkpolicy.networking.k8s.io/app created
+secret/webapp created
+service/webapp created</code></pre>
+<p>Next, run <span style="font-size: 16px;"><code>kubectl get services --namespace k8s-workshop.</code></span></p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl get services --namespace k8s-workshop
+NAME            TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE
+redis-primary   ClusterIP      10.8.11.78           6379/TCP       19m
+redis-replica   ClusterIP      10.8.4.228           6379/TCP       19m
+webapp          LoadBalancer   10.8.7.188   34.72.33.15   80:31550/TCP   48s</code></pre>
+<p>You can see that there is a Load Balancer IP pending. If you give it a few minutes, the Load Balancer IP will have changed.</p>
+<p>Now you have the front end tier of the webapp running.</p>
+<h2 style="font-size: 36px;"><strong>Accessing Your Services</strong></h2>
+<p>Now you can take a look at the services available to see how you might actually access the webapp.</p>
+<p style="font-size: 16px;"><code>kubectl -n k8s-workshop get services</code></p>
+<p>You can see that you have both services attached to Redis which are ClusterIP services only accessible from within the cluster. You’ll also see the third service, the webapp, which is exposed publicly because it’s a load balancer service. When you list services, you get an external IP. <code></code></p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl -n k8s-workshop get services
+NAME            TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE
+redis-primary   ClusterIP      10.8.11.78           6379/TCP       20m
+redis-replica   ClusterIP      10.8.4.228           6379/TCP       20m
+webapp          LoadBalancer   10.8.7.188   34.72.33.15   80:31550/TCP   97s</code></pre>
+<p>If you copy the external IP, open a web browser, you can see that our webapp is serving Hello from Kubernetes.</p>
+<p><img src="https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=701&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg" alt="webapp is serving Hello from Kubernetes" width="701" style="width: 701px; display: block; margin-left: auto; margin-right: auto;" srcset="https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=351&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 351w, https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=701&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 701w, https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=1052&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 1052w, https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=1402&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 1402w, https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=1753&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 1753w, https://www.fairwinds.com/hs-fs/hubfs/webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg?width=2103&amp;name=webapp%20is%20serving%20Hello%20from%20Kubernetes.jpg 2103w" sizes="(max-width: 701px) 100vw, 701px"></p>
+<p>To check that this specific pod and the container inside the pod is actually getting traffic, you first need to get the name of the actual pod running: <code>kubectl -n k8s-workshop get pods</code></p>
+<p>You’ll see that there is one webapp pod running. Copy the full name of the pod.</p>
+<pre><code>danielle@cloudshell:~/k8s-workshop/complete (trial-275916)$ kubectl -n k8s-workshop get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+redis-primary-684c84fc56-57brt   1/1     Running   0          25m
+redis-replica-d64bd9565-zn7sg    1/1     Running   0          25m
+<strong>webapp-54c7b758f5-sxjgp</strong>          1/1     Running   0          6m43s</code></pre>
+<p>Run <code>kubectl -n k8s-workshop logs -f <strong>webapp-54c7b758f5-sxjgp</strong></code></p>
+<p>You’ll see that there is one webapp pod running.</p>
+<pre><code>10.4.0.1 - - [11/May/2020:20:50:11 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:14 +0000] "GET / HTTP/1.1" 200 70 0.0029
+10.4.0.1 - - [11/May/2020:20:50:17 +0000] "GET / HTTP/1.1" 200 70 0.0045
+10.4.0.1 - - [11/May/2020:20:50:18 +0000] "GET / HTTP/1.1" 200 70 0.0029
+10.4.0.1 - - [11/May/2020:20:50:20 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:23 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:26 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:28 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:29 +0000] "GET / HTTP/1.1" 200 70 0.0035
+10.4.0.1 - - [11/May/2020:20:50:32 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:35 +0000] "GET / HTTP/1.1" 200 70 0.0031
+10.4.0.1 - - [11/May/2020:20:50:38 +0000] "GET / HTTP/1.1" 200 70 0.0029
+10.4.0.1 - - [11/May/2020:20:50:38 +0000] "GET / HTTP/1.1" 200 70 0.0044
+10.4.0.1 - - [11/May/2020:20:50:41 +0000] "GET / HTTP/1.1" 200 70 0.0032
+10.4.0.1 - - [11/May/2020:20:50:44 +0000] "GET / HTTP/1.1" 200 70 0.0031
+10.4.0.1 - - [11/May/2020:20:50:47 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:50:48 +0000] "GET / HTTP/1.1" 200 70 0.0027
+10.4.0.1 - - [11/May/2020:20:50:50 +0000] "GET / HTTP/1.1" 200 70 0.0031</code></pre>
+<p>You can see internal health check requests to see that the pod is live. If you go back to the browser and hit refresh, you’ll see the different git requests against the base URL coming through. You’ll know that from the public internet, there is access to your webapp running in your Kubernetes cluster.</p>
+<pre><code>10.4.0.1 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0030
+10.4.0.1 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0029
+10.4.0.1 - - [11/May/2020:20:51:38 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0020
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0027
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0028
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0027
+10.4.0.1 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0081
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0011
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET / HTTP/1.1" 200 70 0.0027
+10.128.0.22 - - [11/May/2020:20:51:38 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0012
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0028
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0029
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.128.0.22 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0028
+10.128.0.22 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.128.0.22 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0028
+10.128.0.22 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0027
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET / HTTP/1.1" 200 70 0.0028
+10.4.0.1 - - [11/May/2020:20:51:39 +0000] "GET /favicon.ico HTTP/1.1" 200 37 0.0010
+10.4.0.1 - - [11/May/2020:20:51:41 +0000] "GET / HTTP/1.1" 200 70 0.0030</code></pre>
+<p>You have now have deployed a multi-tier web application into Kubernetes. This is just the tip of the iceberg and there are many ways that you can orchestrate workloads and applications in Kubernetes.</p>
+<p><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" id="hs-cta-wrapper-e68d92d3-c876-4525-b775-6123e46c7212"><span class="hs-cta-node hs-cta-e68d92d3-c876-4525-b775-6123e46c7212" id="hs-cta-e68d92d3-c876-4525-b775-6123e46c7212"><!--[if lte IE 8]><div id="hs-cta-ie-element"></div><![endif]--><a href="https://cta-redirect.hubspot.com/cta/redirect/2184645/e68d92d3-c876-4525-b775-6123e46c7212"><img class="hs-cta-img" id="hs-cta-img-e68d92d3-c876-4525-b775-6123e46c7212" style="border-width:0px;" height="3126" width="6417" src="https://no-cache.hubspot.com/cta/default/2184645/e68d92d3-c876-4525-b775-6123e46c7212.png" alt="download-kubernetes-best practices-1"></a></span><script charset="utf-8" src="/hs/cta/cta/current.js"></script><script type="text/javascript"> hbspt.cta._relativeUrls=true;hbspt.cta.load(2184645, 'e68d92d3-c876-4525-b775-6123e46c7212', {"region":"na1"}); </script></span><!-- end HubSpot Call-to-Action Code --></p></span></div>
+</div>
+
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_1542814593686254" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-rich_text widget-type-rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><span id="hs_cos_wrapper_module_1542814593686254_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"></span></div>
+
+</div><!--end widget-span -->
+
+<!-- End Blog Post Body -->
+<!-- Blog Post Author
+<div class="u3gm-blog-post__author">  
+  <p class="bio">Danielle Cook is a technical writer at Fairwinds.</p>
+  
+</div>
+End Blog Post Author -->  
+</section>
+
+
+
+
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end body -->
+</div><!--end body wrapper -->
+
+<div class="footer-container-wrapper">
+    <div class="footer-container container-fluid">
+
+<div class="row-fluid-wrapper row-depth-1 row-number-1 ">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget " style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<div id="hs_cos_wrapper_module_161859384284068" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><section class="u3gm-footer-v2">
+  <div class="u3gm-footer__menus">
+        <!-- .menu1 -->
+    <div class="u3gm-footer__menus__menu menu1 logo-container">
+    </div>
+    <!-- .menu1 -->
+    <div class="upper-menu-container">
+    <div class="u3gm-footer__menus__menu menu1">
+      <span id="hs_cos_wrapper_module_161859384284068_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_menu" style="" data-hs-cos-general-type="widget" data-hs-cos-type="menu"><div id="hs_menu_wrapper_module_161859384284068_" class="hs-menu-wrapper active-branch flyouts hs-menu-flow-vertical" role="navigation" data-sitemap-name="default" data-menu-id="44928455069" aria-label="Navigation Menu">
+ <ul role="menu" class="active-branch">
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="https://www.fairwinds.com/insights" aria-haspopup="true" aria-expanded="false" role="menuitem">Fairwinds Insights</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security" role="menuitem">Kubernetes Security</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/cloud-native-service-ownership" role="menuitem">Service Ownership</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/enforce-kubernetes-policy" role="menuitem">Policy Enforcement</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-compliance" role="menuitem">Governance and Compliance</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/insights-features" role="menuitem">Cost Optimization</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://insights.docs.fairwinds.com/" role="menuitem">Documentation</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="https://www.fairwinds.com/open-source-software" aria-haspopup="true" aria-expanded="false" role="menuitem">Open Source</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/polaris" role="menuitem">Polaris</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-polaris-upgrade" role="menuitem">Polaris Upgrade</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/elements" role="menuitem">Fairwinds Elements</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Solutions</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-audit-improve" role="menuitem">Audit and Improve</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops" role="menuitem">Managed Kubernetes</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/clusterops-advisory" role="menuitem">Kubernetes Advisory</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubestart" role="menuitem">Kubernetes Quick Start</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Why Fairwinds</a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/customer-stories" role="menuitem">Customer Stories</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/customers" role="menuitem">Why Our Customers Love Us</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/the-fairwinds-difference" role="menuitem">The Fairwinds Difference</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-maturity-model" role="menuitem">Kubernetes Maturity Model</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children active-branch" role="none"><a href="javascript:;" aria-haspopup="true" aria-expanded="false" role="menuitem">Resources</a>
+   <ul role="menu" class="hs-menu-children-wrapper active-branch">
+    <li class="hs-menu-item hs-menu-depth-2 active active-branch" role="none"><a href="https://www.fairwinds.com/blog" role="menuitem">Blog</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/resource-library" role="menuitem">Library</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/kubernetes-security-best-practices" role="menuitem">K8S Security Resources</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/blog/kubernetes-support" role="menuitem">Support</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/fairwinds-news" role="menuitem">Press</a></li>
+   </ul></li>
+  <li class="hs-menu-item hs-menu-depth-1 hs-item-has-children" role="none"><a href="https://www.fairwinds.com" aria-haspopup="true" aria-expanded="false" role="menuitem"><img src="https://www.fairwinds.com/hubfs/logosvgfw.svg"></a>
+   <ul role="menu" class="hs-menu-children-wrapper">
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="javascript:;" role="menuitem">Fairwinds is the trusted partner for Kubernetes security, policy and governance. With Fairwinds, customers ship cloud native applications faster, more cost effectively and with less risk. Unify dev, sec and ops with software that simplifies complexity.</a></li>
+    <li class="hs-menu-item hs-menu-depth-2" role="none"><a href="https://www.fairwinds.com/contact-us" role="menuitem">Contact Us</a></li>
+   </ul></li>
+ </ul>
+</div></span>
+    </div>
+    </div>
+    <hr>
+  </div>
+  <div class="u3gm-footer__utility__footer">
+    <div class="social">
+      <a href="https://github.com/FairwindsOps" target="_blank"><span class="fab fa-github"></span></a>      
+      <a href="https://fairwindscommunity.slack.com" target="_blank"><span class="fab fa-slack"></span></a>  
+      <a href="https://www.linkedin.com/company/fairwinds/" target="_blank"><span class="fab fa-linkedin-in"></span></a>
+      <a href="https://twitter.com/fairwindsops" target="_blank"><span class="fab fa-twitter"></span></a>
+      <a href="https://www.facebook.com/fairwindsops/" target="_blank"><span class="fab fa-facebook-f"></span></a>
+      <a href="https://www.youtube.com/channel/UCxu2-KYM1pVKW6Wu_I854Bg/" target="_blank"><span class="fab fa-youtube"></span></a>
+      <a href="https://medium.com/@fairwinds" target="_blank"><span class="fab fa-medium"></span></a>
+      <a href="https://www.instagram.com/fairwindsops/" target="_blank"><span class="fab fa-instagram"></span></a>
+   </div>
+    <div class="copyright">©2021 Fairwinds Ops, Inc., 177 Huntington Avenue, Ste 1703, Boston, MA 02115-3153<span>|</span><a href="/privacy-policy">Privacy Policy</a><span>|</span><a href="/responsible-disclosure">Responsible Disclosure</a></div>
+   </div>
+
+
+</section></div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+    </div><!--end footer -->
+</div><!--end footer wrapper -->
+
+    <script src="/hs/hsstatic/jquery-libs/static-1.1/jquery/jquery-1.7.1.js"></script>
+<script>hsjQuery = window['jQuery'];</script>
+<script>
+(function () {
+    window.addEventListener('load', function () {
+        setTimeout(function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/_hcms/perf', true /*async*/);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                // do nothing.
+            };
+            var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            function populateNetworkInfo(name, connection, info) {
+                if (name in connection) {
+                    info[name] = connection[name];
+                }
+            }
+            var networkInfo = {};
+            if (connection) {
+                ['type', 'effectiveType', 'downlink', 'rtt'].forEach(function(name) {
+                    populateNetworkInfo(name, connection, networkInfo);
+                });
+            }
+            var perfData = {
+                url: location.href,
+                portal: 2184645,
+                content: 29245093378,
+                group: -1,
+                connection: networkInfo,
+                timing: performance.timing
+            };
+            xhr.send(JSON.stringify(perfData));
+        }, 3000);  // Execute this 3 seconds after onload.
+    });
+})();
+</script>
+
+<script>
+if (typeof hsVars !== 'undefined') { hsVars['language'] = 'en'; }
+</script>
+
+<script src="/hs/hsstatic/cos-i18n/static-1.37/bundles/project.js"></script>
+<script src="https://www.fairwinds.com/hubfs/Copied%20Assets/U3GM%20Header/hubspot.search.min.js"></script>
+<script src="https://www.fairwinds.com/hubfs/Copied%20Assets/U3GM%20Header/jquery.nb.offscreenMenuToggle.min.js"></script>
+<script src="https://www.fairwinds.com/hs-fs/hub/2184645/hub_generated/module_assets/49451837735/1626358436685/module_49451837735_U3GM_Header_v4.min.js"></script>
+<script src="/hs/hsstatic/keyboard-accessible-menu-flyouts/static-1.17/bundles/project.js"></script>
+<script src="https://www.fairwinds.com/hubfs/Copied%20Assets/U3GM%20Footer/js.cookie.min.js"></script>
+<script src="https://www.fairwinds.com/hubfs/Copied%20Assets/U3GM%20Footer/aos3.min.js"></script>
+<script src="https://www.fairwinds.com/hs-fs/hub/2184645/hub_generated/module_assets/44928667140/1626108198863/module_44928667140_U3GM_Footer_v2.min.js"></script>
+
+<!-- Start of HubSpot Analytics Code -->
+<script type="text/javascript">
+var _hsq = _hsq || [];
+_hsq.push(["setContentType", "blog-post"]);
+_hsq.push(["setCanonicalUrl", "https:\/\/www.fairwinds.com\/blog\/how-to-deploy-multi-tiered-web-application-with-kubernetes"]);
+_hsq.push(["setPageId", "29245093378"]);
+_hsq.push(["setContentMetadata", {
+    "contentPageId": 29245093378,
+    "legacyPageId": "29245093378",
+    "contentFolderId": null,
+    "contentGroupId": 21423861432,
+    "abTestId": null,
+    "languageVariantId": 29245093378,
+    "languageCode": "en",
+    
+}]);
+</script>
+
+<script type="text/javascript" id="hs-script-loader" async defer src="/hs/scriptloader/2184645.js"></script>
+<!-- End of HubSpot Analytics Code -->
+
+
+<script type="text/javascript">
+var hsVars = {
+    ticks: 1629543032662,
+    page_id: 29245093378,
+
+    content_group_id: 21423861432,
+    portal_id: 2184645,
+    app_hs_base_url: "https://app.hubspot.com",
+    cp_hs_base_url: "https://cp.hubspot.com",
+    language: "en",
+    analytics_page_type: "blog-post",
+    analytics_page_id: "29245093378",
+    category_id: 3,
+    folder_id: 0,
+    is_hubspot_user: false
+}
+</script>
+
+
+<script defer src="/hs/hsstatic/HubspotToolsMenu/static-1.109/js/index.js"></script>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TM95WXQ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- LeadLander -->
+<script type="text/javascript" language="javascript">
+  var sf14gv = 32793;
+  (function() {
+    var sf14g = document.createElement('script');
+    sf14g.src = 'https://tracking.leadlander.com/lt.min.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(sf14g, s);
+  })();
+</script>
+<!-- End LeadLander -->
+<!-- LinkedIn Retargeting -->
+<script type="text/javascript">
+_linkedin_partner_id = "1231898";
+window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+</script><script type="text/javascript">
+(function(){var s = document.getElementsByTagName("script")[0];
+var b = document.createElement("script");
+b.type = "text/javascript";b.async = true;
+b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+s.parentNode.insertBefore(b, s);})();
+</script>
+<noscript>
+<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=1231898&amp;fmt=gif">
+</noscript> 
+<!-- End LinkedIn Retargeting -->
+<!-- Twitter universal website tag code -->
+<script>
+!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+},s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+// Insert Twitter Pixel ID and Standard Event data below
+twq('init','nxr46');
+twq('track','PageView');
+</script>
+<!-- End Twitter universal website tag code -->
+<!-- Intensify website tag code -->
+<script>
+function appendScriptTag(link) {
+    var sc = document.createElement("script");
+    sc.setAttribute("src", link);
+    sc.setAttribute("defer", "");
+    sc.setAttribute("type", "text/javascript");
+
+var elementToAppendTo = document.getElementsByTagName('html')[0] || document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0];
+
+    elementToAppendTo.appendChild(sc);
+  }
+
+
+  var currentWebsiteUrl = encodeURIComponent(window.location.href);
+  var serverUrl = "https://tracking.intentsify.io";
+  var link = serverUrl + '/page-tracking/intentsify-fairwinds/' + currentWebsiteUrl;
+  
+  setTimeout(function(){
+appendScriptTag(link);
+  }, 1000);
+
+</script>
+<!-- Start of Async Drift Code -->
+<script>
+"use strict";
+
+!function() {
+  var t = window.driftt = window.drift = window.driftt || [];
+  if (!t.init) {
+    if (t.invoked) return void (window.console && console.error && console.error("Drift snippet included twice."));
+    t.invoked = !0, t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
+    t.factory = function(e) {
+      return function() {
+        var n = Array.prototype.slice.call(arguments);
+        return n.unshift(e), t.push(n), t;
+      };
+    }, t.methods.forEach(function(e) {
+      t[e] = t.factory(e);
+    }), t.load = function(t) {
+      var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
+      o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
+      var i = document.getElementsByTagName("script")[0];
+      i.parentNode.insertBefore(o, i);
+    };
+  }
+}();
+drift.SNIPPET_VERSION = '0.3.1';
+drift.load('hypwd9dver56');
+</script>
+<!-- End of Async Drift Code -->
+<!-- End intensify website tag code -->
+
+<div id="fb-root"></div>
+ <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&status=0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+ 
+
+
+    
+    <!-- Generated by the HubSpot Template Builder - template version 1.03 -->
+
+</div></body></html>

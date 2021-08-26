@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>Deploy a Three Tier Web Application to Kubernetes</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Deploy a Three Tier Web Application to Kubernetes">
+    
+
+    <link rel="alternate" type="application/rss+xml" href="/index.xml" title="ThorneLabs" />
+
+    <link rel="canonical" href="https://thornelabs.net/posts/deploy-a-three-tier-web-application-to-kubernetes.html" />
+
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon-76x76.png" sizes="76x76" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon-120x120.png" sizes="120x120" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon-152x152.png" sizes="152x152" />
+
+    <link rel="stylesheet" href="/css/bootstrap-4.0.0.min.css" />
+
+    <style>
+         
+         
+         
+
+        body {
+            background-color: #F0F0F0 !important;
+            font-family: system-ui, sans-serif;
+        }
+
+        blockquote {
+            border-left: 5px solid #EEE;
+            padding: 0px 11px 0px 22px;
+        }
+
+        code {
+            background-color: #f9f2f4;
+            color: #c7254e;
+            padding: 2px 4px;
+            word-wrap: break-word;
+        }
+
+        h1, .h1 { font-size: 32px !important; }
+        h2, .h2 { font-size: 26px !important; padding: 10px 0px 10px 0px; border-bottom: 1px solid #DCDCDC; }
+        h3, .h3 { font-size: 20px !important; padding: 10px 0px 10px 0px; }
+        h4, .h4 { font-size: 18px !important; padding: 10px 0px 10px 0px; }
+
+        .navbar-brand {
+            font-size: 38px !important;
+        }
+
+        img {
+            display: block;
+            padding: 2px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            color: #333;
+            padding: 9.5px;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+         
+         
+         
+
+        #header {
+            padding: 15px 0px 0px 0px;
+        }
+
+        #footer {
+            padding: 20px 0px 5px 0px;
+            font-size: .90em;
+        }
+
+        a.subscribe-links {
+            color: #FFF;
+        }
+
+        a:hover.subscribe-links {
+            color: #FFF;
+            text-decoration: none;
+            border-bottom: 1px solid #FFF;
+        }
+
+        .boxify {
+            border: 1px solid #E9E9E9;
+            background-color: #FFFFFF;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            overflow: auto;
+            box-shadow: 0px 8px 15px rgba(80, 90, 100, 0.1);
+        }
+
+        .dropdown-item-custom {
+            word-wrap: break-word;
+            white-space: normal;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .page-navigation {
+            display: block;
+            width: auto;
+            overflow: hidden;
+            padding: 0px 20px 0px 20px;
+        }
+
+        .page-navigation a {
+            display: block;
+            width: 50%;
+            float: left;
+            margin: 1em 0;
+        }
+
+        .page-navigation .next {
+            text-align: right;
+            float: right;
+        }
+
+        ul.post-tags {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        ul.post-tags li {
+            float: left;
+            padding-right: 5px;
+            padding-bottom: 5px;
+        }
+
+        ul.post-tags li a {
+            display: block;
+            font-weight: bold;
+            background-color: #ffd740;
+            color: #585858;
+            border-radius: 5px;
+            padding: 5px;
+        }
+    </style>
+
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-39571615-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-39571615-1');
+    </script>
+</head>
+<body>
+    <div id="header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <a class="navbar-brand" href="/">
+                            Thorne<strong>Labs</strong>
+                        </a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/tags.html">tags</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/terms.html">terms</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="col-lg-9">
+
+                
+
+<article class="boxify" itemscope itemtype="http://schema.org/BlogPosting">
+    <h1 itemprop="name headline">Deploy a Three Tier Web Application to Kubernetes</h1>
+
+    <p>
+        <span itemprop="datePublished" content="2017-06-17" class="text-muted">Published June 17, 2017</span>
+        <span itemprop="dateModified" content="2019-08-11" class="text-muted"> &#8226; Updated August 11, 2019</span>
+    </p>
+
+    <ul class="post-tags" itemprop="keywords">
+        
+        <li><a href="/tags/documentation.html">documentation</a></li>
+        
+        <li><a href="/tags/kubernetes.html">kubernetes</a></li>
+        
+        <li><a href="/tags/google-cloud-platform.html">google cloud platform</a></li>
+        
+        <li><a href="/tags/google-kubernetes-engine.html">google kubernetes engine</a></li>
+        
+    </ul>
+
+    <meta itemprop="author publisher" content="James Thorne">
+
+    <hr />
+
+    <div itemprop="articleBody">
+
+    <p><a href="https://en.wikipedia.org/wiki/Multitier_architecture#Three-tier_architecture">Multi-tier architectures</a> are a common way to design web applications:</p>
+<ol>
+<li>A frontend - presentation - tier which provides the user interface</li>
+<li>An application - logic - tier where the processing happens</li>
+<li>A backend - data - tier where different storage technologies run</li>
+</ol>
+<p>The different tiers could be deployed to a single virtual machine. Configuration management tools such as Ansible, Salt, Chef, or Puppet could be used to automate the deployment process. However, if the web application needs to start handling more traffic, it is only a matter of time before the resources of that single virtual machine are consumed. The single virtual machine could be scaled up by adding more CPU, RAM, and storage, but there is usually an upper limit to doing that.</p>
+<p>Because of the multi-tier architecture, each tier could be separated into its own virtual machine with a load balancer in front of each allowing each tier to be independently scaled, but that can create a lot of overhead due to the additional virtual machines running. Additionally, if want to continue using configuration management tools to manage this now more complicated architecture, the deployment scripts will need to be heavily modified.</p>
+<p>A potentially easier and forward-thinking solution would be to containerize each tier and deploy, manage, and scale those containers using container orchestration software. In this post, you will be using Docker to containerize each tier, and Kubernetes to orchestrate all of those containers.</p>
+<p>You will be deploying a three tier web application to <a href="https://cloud.google.com/container-engine/">Google Container Engine (GKE)</a> due to its ability to quickly create a Kubernetes cluster. <a href="https://cloud.google.com/container-registry/">Google Cloud Container Registry</a> and <a href="https://cloud.google.com/container-builder/docs/">Google Cloud Container Builder</a> will also be used.</p>
+<p>If you prefer videos to blog posts, you can watch a recent episode of the <a href="https://www.meetup.com/GCPonline/">GCP Online Meetup</a> where I present a <a href="https://www.youtube.com/watch?v=Q_VfyLfyDg4">live demo</a> of what this blog post will cover. However, I have improved upon some of the concepts presented during the live demo in this blog post, specifically concerning rolling updates.</p>
+<h2 id="the-three-tier-web-application">The Three Tier Web Application</h2>
+<p>The three tier web application you will be deploying to Kubernetes is called <a href="https://github.com/pinterest/snappass">SnapPass</a>. Developed at Pinterest, it is a Python Flask application that uses redis as the storage backend to provide a simple, secure, and ephemeral way to share passwords. I am a fan of SnapPass, and you can read more about why <a href="/posts/a-simple-secure-ephemeral-way-to-share-passwords.html">it&rsquo;s a simple, secure, and ephemeral way to share passwords</a>.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>This post assumes the following:</p>
+<ul>
+<li>You are familiar with Google Cloud Platform (GCP) and have already created a GCP Project</li>
+<li>You have installed the Google Cloud SDK</li>
+<li>You have authenticated the <code>gcloud</code> command against your Google Account</li>
+</ul>
+<h3 id="create-a-gcp-project">Create a GCP Project</h3>
+<p>If you have not yet created a <strong>GCP Project</strong>, follow these steps:</p>
+<ol>
+<li>Open a web browser, and create or log in to a Google Account</li>
+<li>Navigate to the <a href="https://console.cloud.google.com">GCP Console</a></li>
+<li>If this is your first GCP Project, you will be prompted to create a GCP Project. Each Google Account gets $300 in credit to use within 12 months towards GCP. You are required to enter a credit card to create a GCP Project, but it will not be charged until the $300 credit is consumed or 12 months expire.</li>
+<li>If this is a new GCP Project, you might need to enable some of the GCP products you will be using:
+<ul>
+<li>Enable the Compute Engine API by navigating to the <a href="https://console.cloud.google.com/compute">Compute Engine section of the GCP Console</a> and waiting for initialization to complete</li>
+<li>Enable Container Registry by navigating to the <a href="https://console.cloud.google.com/gcr">Container Registry section of the GCP Console</a> and clicking <strong>Enable Container Registry</strong> (you might need to select your GCP Project from the Project menu in the upper right section of the GCP Console)</li>
+<li>Enable the Container Builder API by navigating to the <a href="https://console.cloud.google.com/apis/api/cloudbuild.googleapis.com/overview">Container Builder API section of the GCP Console</a> and clicking <strong>Enable API</strong></li>
+</ul>
+</li>
+</ol>
+<h3 id="install-the-google-cloud-sdk">Install the Google Cloud SDK</h3>
+<p>If you have not yet installed the <strong>Google Cloud SDK</strong>, follow the instructions <a href="https://cloud.google.com/sdk/downloads">here</a>.</p>
+<h3 id="authenticate-gcloud">Authenticate gcloud</h3>
+<p>Once you have created a GCP Project and installed the Google Cloud SDK, the last step is to authenticate the <code>gcloud</code> command to your Google Account. Open your terminal application and run the following command:</p>
+<pre><code>gcloud auth login
+</code></pre>
+<p>A web page will open in your web browser. Select your Google Account and give it permission to access GCP. Once completed, you will be authenticated and ready to move forward.</p>
+<h2 id="set-the-gcp-project-id-and-zone">Set the GCP Project ID and Zone</h2>
+<p>The first thing to do is set a few variables, specifically the GCP Project ID and the GCP Zone to deploy in.</p>
+<p>Open your terminal application and get a list of all your current GCP Projects:</p>
+<pre><code>gcloud projects list
+</code></pre>
+<p>The first column will contain all of your GCP Project&rsquo;s IDs. Copy the GCP Project ID you want to deploy to, and set its value in an environment variable:</p>
+<pre><code>export GCP_PROJECT_ID=&quot;&lt;PROJECT_ID&gt;&quot;
+</code></pre>
+<p>Then, configure the values using <code>gcloud config</code>:</p>
+<pre><code>gcloud config set project $GCP_PROJECT_ID
+
+gcloud config set compute/zone us-central1-a
+</code></pre>
+<h2 id="build-the-docker-images">Build the Docker Images</h2>
+<p>With <code>gcloud</code> configured, the next step is to containerize the web application. The web application has three tiers:</p>
+<ol>
+<li>nginx</li>
+<li>Python</li>
+<li>redis</li>
+</ol>
+<p>Each tier will be containerized using Docker. Despite there being three tiers, you will only be creating two Docker images - nginx and Python - because the redis Docker image will be pulled from redis&rsquo; official Docker Hub repository.</p>
+<p>The two Docker images that need to be created could be built on your local workstation, but instead you will be using Google Cloud Container Builder.</p>
+<h3 id="build-the-snappass-nginx-docker-image">Build the snappass-nginx Docker Image</h3>
+<p><code>git clone</code> the <strong>snappass-nginx-blog-post</strong> repository:</p>
+<pre><code>git clone https://github.com/jameswthorne/snappass-nginx-blog-post.git
+</code></pre>
+<p>Change to the newly cloned directory:</p>
+<pre><code>cd snappass-nginx-blog-post
+</code></pre>
+<p>Next, you will need to generate a couple cryptographic things:</p>
+<ol>
+<li>A Diffie-Hellman key</li>
+<li>A self-signed SSL certificate</li>
+</ol>
+<p>Generating a unique Diffie-Hellman key should be part of your deployment process if you want a higher SSL score on <a href="https://www.ssllabs.com/">Qualy&rsquo;s SSL Labs</a>. So, generate a Diffie-Hellman key with the following command (this make take a few minutes to complete):</p>
+<pre><code>openssl dhparam -out nginx_configuration/dhparam.pem 2048
+</code></pre>
+<p>Create a directory to store the self-signed SSL certificates in:</p>
+<pre><code>mkdir ssl_certs
+</code></pre>
+<p>Create the Private Key and the Certificate Signing Request:</p>
+<pre><code>openssl req -new -newkey rsa:2048 -nodes -keyout ssl_certs/example.com.key -out ssl_certs/example.com.csr
+</code></pre>
+<p>You will be prompted to fill out the following fields. You can input bogus information - or none at all - in those fields since this is not meant to be a valid SSL certificate. Additionally, you can leave the <strong>challenge password</strong> empty:</p>
+<pre><code>Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+</code></pre>
+<p>Create the SSL certificate - valid for 30 days - from the Certificate Signing Request and sign it with the Private Key:</p>
+<pre><code>openssl x509 -req -days 30 -in ssl_certs/example.com.csr -signkey ssl_certs/example.com.key -out ssl_certs/example.com.crt
+</code></pre>
+<p>Next, you will commit your latest changes to version control using <code>git</code>.</p>
+<p>If you have never used <code>git</code> in the environment you are working in, you will need to tell <code>git</code> what your name and email are with the following commands (this only needs to be done once per environment you use the <code>git</code> command in):</p>
+<pre><code>git config --global user.name &quot;Firstname Lastname&quot;
+git config --global user.email &quot;you@example.com&quot;
+</code></pre>
+<p>Now, you can commit your latest changes:</p>
+<p>Do <strong>not</strong> skip this step, or any other git steps, as the git SHA will be used later.</p>
+<pre><code>git add --all
+
+git commit -m &quot;Added dhparam and SSL certificates&quot;
+</code></pre>
+<p>After you have committed your changes to git, store the git SHA of the latest commit in an environment variable:</p>
+<pre><code>export SNAPPASS_NGINX_GIT_SHA=$(git rev-parse HEAD)
+</code></pre>
+<p>Now, build the Docker image using Google Cloud Container Builder. The git SHA you just stored in an environment variable will be used to tag the Docker image so you know exactly what git commit the Docker image was built from:</p>
+<pre><code>gcloud builds submit --tag us.gcr.io/$GCP_PROJECT_ID/snappass-nginx:$SNAPPASS_NGINX_GIT_SHA .
+</code></pre>
+<p>After about 30 seconds of build time, you should have one Docker image in your GCP Project&rsquo;s Container Registry:</p>
+<pre><code>gcloud container images list --repository us.gcr.io/$GCP_PROJECT_ID
+</code></pre>
+<h3 id="build-the-snappass-docker-image">Build the snappass Docker Image</h3>
+<p>Change out of the <strong>snappass-nginx-blog-post</strong> directory by going back one directory:</p>
+<pre><code>cd ..
+</code></pre>
+<p><code>git clone</code> the <strong>snappass</strong> repository:</p>
+<pre><code>git clone https://github.com/pinterest/snappass.git
+</code></pre>
+<p>Change to the newly cloned directory:</p>
+<pre><code>cd snappass
+</code></pre>
+<p>Store the git SHA of the latest commit in an environment variable:</p>
+<pre><code>export SNAPPASS_GIT_SHA=$(git rev-parse HEAD)
+</code></pre>
+<p>Now, build the Docker image using Google Cloud Container Builder. Once again, the git SHA you just stored in an environment variable will be used to tag the Docker image so you know exactly what git commit the Docker image was built from:</p>
+<pre><code>gcloud builds submit --tag us.gcr.io/$GCP_PROJECT_ID/snappass:$SNAPPASS_GIT_SHA .
+</code></pre>
+<p>After about one minute of build time, you should now have two Docker images in your GCP Project&rsquo;s Container Registry:</p>
+<pre><code>gcloud container images list --repository us.gcr.io/$GCP_PROJECT_ID
+</code></pre>
+<h3 id="build-the-redis-docker-image">Build the redis Docker Image</h3>
+<p>There is nothing for you to build here since you will be pulling the redis Docker image from <a href="https://hub.docker.com/_/redis/">redis&rsquo; official Docker Hub repository</a> later in the post.</p>
+<h2 id="create-the-gke-cluster">Create the GKE Cluster</h2>
+<p>With the necessary Docker images created, it is time for you to create the GKE cluster. Run the following command to create a GKE cluster named <strong>cluster-1</strong> with <strong>three</strong> worker nodes as machine type <strong>g1-small (1 shared CPU and 1.7 GB RAM)</strong>:</p>
+<pre><code>gcloud container clusters create cluster-1 --num-nodes 3 --machine-type g1-small
+</code></pre>
+<p>After a few minutes, the GKE cluster will be up and running.</p>
+<h2 id="configure-kubernetes-credentials">Configure Kubernetes Credentials</h2>
+<p>Once the GKE cluster is up and running, you need to obtain the necessary credentials to communicate with it via the <code>kubectl</code> command. The <code>gcloud</code> command makes this very easy:</p>
+<pre><code>gcloud container clusters get-credentials cluster-1
+</code></pre>
+<p>After the <code>gcloud</code> command completes, you can begin communicating with the GKE cluster using the <code>kubectl</code> command. Try running <code>kubectl get nodes</code>. The response should display three nodes which represent the three virtual machines running the Kubernetes software.</p>
+<h2 id="deploy-the-web-application-to-gke">Deploy the Web Application to GKE</h2>
+<p>You are now ready to begin deploying the three tier web application to Kubernetes. Since each tier builds upon the previous tier, you are going to deploy everything backwards. This isn&rsquo;t always necessary, but it helps to show how everything layers on top of each other.</p>
+<p>The following steps will have you setting up three <a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/">Kubernetes Deployments</a> and three <a href="https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services---service-types">Kubernetes Services</a>. A Kubernetes Deployment allows you to specify what Docker image you want to deploy as a Docker container and how many of those Docker containers to run. It also handles rolling updates, which will be covered later in the post. The two types of Kubernetes Services you will be creating are <strong>ClusterIP</strong> and <strong>LoadBalancer</strong>; these are essentially internal and external load balancers, respectively.</p>
+<h3 id="deploy-redis">Deploy redis</h3>
+<p>Deploy the redis Docker image as a Docker container using a Kubernetes Deployment:</p>
+<pre><code>kubectl run snappass-redis --image=redis --port=6379 --replicas=1 --labels=&quot;name=snappass-redis,tier=backend,app=snappass&quot;
+</code></pre>
+<p>Because redis is the storage backend, it is the stateful tier in the web application, and you will only be creating one replica. If you created more than one replica, each replica would be independent of each other which would cause problems for end users trying to access their passwords. In order for redis to be properly scaled out, it would need to be clustered which is out of scope for this post.</p>
+<p>The Python Flask application needs to communicate with redis, so create a Kubernetes Service of type <strong>ClusterIP</strong> which is essentially an internal load balancer that can only communicate within the GKE cluster using its short name <strong>snappass-redis</strong>:</p>
+<pre><code>kubectl expose deployment snappass-redis --type=ClusterIP
+</code></pre>
+<h3 id="deploy-snappass">Deploy snappass</h3>
+<p>Deploy the snappass Docker image as a Docker container using a Kubernetes Deployment:</p>
+<pre><code>kubectl run snappass --image=us.gcr.io/$GCP_PROJECT_ID/snappass:$SNAPPASS_GIT_SHA --replicas=1 --port=5000 --env=&quot;REDIS_HOST=snappass-redis&quot; --labels=&quot;name=snappass,tier=backend,app=snappass&quot;
+</code></pre>
+<p>Due to the large size of the snappass Docker image, it might take up to one minute for the Deployment to complete.</p>
+<p>You might have noticed the additional command line switch, <code>--env=&quot;REDIS_HOST=snappass-redis&quot;</code>. This tells the Python Flask application how to communicate with the redis Kubernetes Service. Because <strong>snappass-redis</strong> is a short name registered in Kubernetes&rsquo; internal DNS, that short name will resolve to the internal IP address the <strong>snappass-redis</strong> Kubernetes Service is listening on.</p>
+<p>nginx needs to communicate with the Python Flask application, so create a Kubernetes Service of type <strong>ClusterIP</strong> which is essentially an internal load balancer that can only communicate within the GKE cluster using its short name <strong>snappass</strong>.</p>
+<pre><code>kubectl expose deployment snappass --type=ClusterIP
+</code></pre>
+<h3 id="deploy-nginx">Deploy nginx</h3>
+<p>Deploy the nginx Docker image as a Docker container using a Kubernetes Deployment:</p>
+<pre><code>kubectl run snappass-nginx --image=us.gcr.io/$GCP_PROJECT_ID/snappass-nginx:$SNAPPASS_NGINX_GIT_SHA --replicas=1 --port 443 --labels=&quot;name=snappass-nginx,tier=frontend,app=snappass&quot;
+</code></pre>
+<p>Because the nginx Docker container is the frontend of the web application, it needs to be publicly facing. Instead of creating a Kubernetes Service of type <strong>ClusterIP</strong>, you will create a Kubernetes Service of type <strong>LoadBalancer</strong> which will create a <a href="https://en.wikipedia.org/wiki/OSI_model#Layer_4:_Transport_Layer">Layer 4</a> <a href="https://cloud.google.com/compute/docs/load-balancing/network/">Google Cloud Network Load Balancer</a> with a public IP address (it may take up to a couple minutes for the network load balancer to deploy):</p>
+<pre><code>kubectl expose deployment snappass-nginx --type=LoadBalancer
+</code></pre>
+<p>Once the network load balancer is deployed, run command <code>kubectl get services snappass-nginx</code> to see the public IP address assigned to it in the <strong>EXTERNAL-IP</strong> column.</p>
+<p>If you wanted to assign a domain name to this web application, you would use that public IP address for the DNS A record.</p>
+<h2 id="test-the-web-application">Test the Web Application</h2>
+<p>With the web application deployed to the GKE cluster and the network load balancer in place, you can access the web application by going to the public IP address obtained in the previous step.</p>
+<p>Open a web browser and navigate to <strong>https://EXTERNAL-IP</strong>. Click past the SSL warnings to get to the web application. You can verify the web application is functional by inputting a password and TTL, clicking <strong>Generate URL</strong>, copying and pasting the generated URL into your web browser and seeing the password you inputted. If you refresh the page it should now 404 because the password you inputted has been deleted from redis.</p>
+<h2 id="query-kubernetes-resources">Query Kubernetes Resources</h2>
+<p>After you have confirmed the web application is functional, go back to your terminal and look through the various Kubernetes components you just created.</p>
+<h3 id="pods">Pods</h3>
+<p>You should currently have three Pods:</p>
+<pre><code>kubectl get pods
+</code></pre>
+<p>If you wanted to filter specific Pods based on the Labels you set when the Deployment was created, you can do so with the following commands:</p>
+<pre><code>kubectl get pods -l 'tier=frontend'
+
+kubectl get pods -l 'tier=backend'
+
+kubectl get pods -l 'app=snappass'
+</code></pre>
+<h3 id="deployments">Deployments</h3>
+<p>You should have three Deployments:</p>
+<pre><code>kubectl get deployments
+</code></pre>
+<p>You can see the replica numbers in the nginx and snappass Deployment rows.</p>
+<h3 id="services">Services</h3>
+<p>You should have four Services. The Service titled <strong>kubernetes</strong> can be ignored because it is part of the Kubernetes system services:</p>
+<pre><code>kubectl get services
+</code></pre>
+<p>You can also filter Services using Labels:</p>
+<pre><code>kubectl get services -l 'tier=frontend'
+</code></pre>
+<h2 id="scale-out-the-web-application">Scale Out the Web Application</h2>
+<p>If the web application needs to handle more traffic, Kubernetes allows you to easily scale out the different tiers because they were originally created as separate Deployments.</p>
+<h3 id="scale-out-the-nginx-deployment">Scale Out the nginx Deployment</h3>
+<p>The nginx Deployment was originally created with one replica which created one Pod on one of the Kubernetes Nodes. If you scale the Deployment to three replicas, two more Pods will be created on the remaining Kubernetes Nodes:</p>
+<pre><code>kubectl scale --replicas=3 deployment/snappass-nginx
+</code></pre>
+<h3 id="scale-out-the-snappass-deployment">Scale Out the snappass Deployment</h3>
+<p>The snappass Deployment was originally created with one replica which created one Pod on one of the Kubernetes Nodes. If you scale the Deployment to three replicas, two more Pods will be created on the remaining Kubernetes Nodes:</p>
+<pre><code>kubectl scale --replicas=3 deployment/snappass
+</code></pre>
+<p>Due to the large size of the snappass Docker image, it may take up to two minutes for the Pods to be created on the remaining Kubernetes Nodes. This is in contrast to the nginx Docker image which replicates almost instantly because it&rsquo;s only about 10 megabytes in size.</p>
+<h3 id="query-kubernetes-resources-1">Query Kubernetes Resources</h3>
+<p>With the nginx and snappass Deployments scaled out, you can see the additional Pods created and the Nodes they are running on with the following command:</p>
+<pre><code>kubectl get pods -o wide
+</code></pre>
+<p>Then, you can see the updated replica numbers in the nginx and snappass Deployments:</p>
+<pre><code>kubectl get deployments
+</code></pre>
+<h2 id="perform-a-rolling-update">Perform a Rolling Update</h2>
+<p>Rolling updates have been made much easier because of Kubernetes Deployments. A Kubernetes Deployment will handle creating a new <a href="https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/">ReplicaSet</a> and scaling it up to the desired replica count while it scales down the original ReplicaSet to zero. The original ReplicaSet will remain - but at a zero replica count - in case you need to rollback an update.</p>
+<p>For this particular rolling update scenario, the SSL certificate currently configured in the nginx Docker image needs to be updated and deployed across the GKE cluster.</p>
+<p>Start by changing back into the <strong>snappass-nginx-blog-post</strong> directory. If you have been following the post step-by-step, that should mean changing back one directory and changing into the <strong>snappass-nginx-blog-post</strong> directory:</p>
+<pre><code>cd ..
+
+cd snappass-nginx-blog-post
+</code></pre>
+<p>Rename the original SSL certificate so it will not be overwritten:</p>
+<pre><code>mv ssl_certs/example.com.crt ssl_certs/example.com.crt.old
+</code></pre>
+<p>Create a new SSL certificate with a 90 day expiration time:</p>
+<pre><code>openssl x509 -req -days 90 -in ssl_certs/example.com.csr -signkey ssl_certs/example.com.key -out ssl_certs/example.com.crt
+</code></pre>
+<p>Commit your latest changes to version control:</p>
+<pre><code>git add --all
+
+git commit -m &quot;Updated SSL certificate&quot;
+</code></pre>
+<p>Update the <strong>SNAPPASS_NGINX_GIT_SHA</strong> environment variable with the latest git SHA:</p>
+<pre><code>export SNAPPASS_NGINX_GIT_SHA=$(git rev-parse HEAD)
+</code></pre>
+<p>Rebuild the nginx Docker image which will create a new Docker image with a new Docker tag corresponding to the latest git SHA:</p>
+<pre><code>gcloud builds submit --tag us.gcr.io/$GCP_PROJECT_ID/snappass-nginx:$SNAPPASS_NGINX_GIT_SHA .
+</code></pre>
+<p>Then, tell Kubernetes to pull the new nginx Docker image based on the updated Docker tag:</p>
+<pre><code>kubectl set image deployment/snappass-nginx snappass-nginx=us.gcr.io/$GCP_PROJECT_ID/snappass-nginx:$SNAPPASS_NGINX_GIT_SHA
+</code></pre>
+<p>Because the nginx Docker image is only about 10 megabytes, Kubernetes will be able to re-deploy the three <strong>snappass-nginx</strong> Pods very quickly. You can confirm the new <strong>snappass-nginx</strong> Docker container is running within each of the three Pods by looking at the SSL certificate for the web application within your web browser. The expiration date should now be 90 days out instead of 30 days.</p>
+<p>Additionally, you can see every step the Deployment took to deploy the new Docker image by running the following command:</p>
+<pre><code>kubectl describe deployment snappass-nginx
+</code></pre>
+<h2 id="delete-everything">Delete Everything</h2>
+<p>To ensure you do not consume anymore of the $300 credit in your GCP Project than is necessary, the following commands will allow you to delete everything you just created.</p>
+<p>Delete all of the Kubernetes Deployments and Services you created with the Label <strong>frontend</strong> and <strong>backend</strong>:</p>
+<pre><code>kubectl delete deployments,services -l &quot;tier in (frontend, backend)&quot;
+</code></pre>
+<p>Destroy the GKE cluster (this will take a few minutes to complete):</p>
+<pre><code>gcloud container clusters delete cluster-1
+</code></pre>
+<p>Delete the Docker images you uploaded by navigating to the <a href="https://console.cloud.google.com/gcr/">Container Registry section of the GCP Console</a> in your web browser and clicking into each repository and deleting all of the Docker images. The repositories will disappear after all Docker images inside of them are deleted.</p>
+<p>Finally, delete the GCP Project you created if you no longer need it by navigating to the <a href="https://console.cloud.google.com/cloud-resource-manager">Manage resources section of the GCP Console</a>, selecting the checkbox next to the GCP Project, and clicking <strong>Delete</strong>.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>You have now successfully deployed, scaled, and updated a three tier web application on top of Kubernetes, but this is just scratching the surface.</p>
+<p>There are many more things and <a href="https://kubernetes.io/docs/concepts/configuration/overview/">best practices</a> that need to be considered before deploying production applications to Kubernetes, such as:</p>
+<ol>
+<li>Converting the command line Kubernetes Deployments used above to YAML files</li>
+<li>Scanning your Docker images for exploits and vulnerabilities</li>
+<li>Using SELinux or AppArmor to further secure your containers (<a href="https://cloud.google.com/container-optimized-os/docs/how-to/secure-apparmor">GKE already uses Docker&rsquo;s default AppArmor security profile</a>)</li>
+<li>Building Continuous Deployment pipelines with something like <a href="https://www.spinnaker.io/">Spinnaker</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/">Configuring Pod autoscaling within Kubernetes</a></li>
+<li>Monitoring Kubernetes clusters with something like <a href="https://prometheus.io/">Prometheus</a></li>
+</ol>
+
+    </div>
+</article>
+
+<div class="page-navigation">
+    
+    <a class="prev" href="https://thornelabs.net/posts/beginning-to-understand-docker-and-kubernetes.html">&laquo; Beginning to Understand Docker and Kubernetes</a>
+    
+    
+    <a class="next" href="https://thornelabs.net/posts/chromecast-high-pitched-and-distorted-audio.html">Chromecast High Pitched and Distorted Audio &raquo;</a>
+    
+</div>
+
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0017276619523269"
+     data-ad-slot="6698356841"
+     data-ad-format="horizontal"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+<script>
+
+
+
+
+
+
+
+!function(A,e){"use strict";"function"==typeof define&&define.amd?define([],e):"object"==typeof module&&module.exports?module.exports=e():(A.AnchorJS=e(),A.anchors=new A.AnchorJS)}(this,function(){"use strict";return function(A){function f(A){A.icon=A.hasOwnProperty("icon")?A.icon:"",A.visible=A.hasOwnProperty("visible")?A.visible:"hover",A.placement=A.hasOwnProperty("placement")?A.placement:"right",A.ariaLabel=A.hasOwnProperty("ariaLabel")?A.ariaLabel:"Anchor",A.class=A.hasOwnProperty("class")?A.class:"",A.base=A.hasOwnProperty("base")?A.base:"",A.truncate=A.hasOwnProperty("truncate")?Math.floor(A.truncate):64,A.titleText=A.hasOwnProperty("titleText")?A.titleText:""}function p(A){var e;if("string"==typeof A||A instanceof String)e=[].slice.call(document.querySelectorAll(A));else{if(!(Array.isArray(A)||A instanceof NodeList))throw new Error("The selector provided to AnchorJS was invalid.");e=[].slice.call(A)}return e}this.options=A||{},this.elements=[],f(this.options),this.isTouchDevice=function(){return!!("ontouchstart"in window||window.DocumentTouch&&document instanceof DocumentTouch)},this.add=function(A){var e,t,i,n,o,s,a,r,c,h,l,u,d=[];if(f(this.options),"touch"===(l=this.options.visible)&&(l=this.isTouchDevice()?"always":"hover"),0===(e=p(A=A||"h2, h3, h4, h5, h6")).length)return this;for(!function(){if(null!==document.head.querySelector("style.anchorjs"))return;var A,e=document.createElement("style");e.className="anchorjs",e.appendChild(document.createTextNode("")),void 0===(A=document.head.querySelector('[rel="stylesheet"], style'))?document.head.appendChild(e):document.head.insertBefore(e,A);e.sheet.insertRule(" .anchorjs-link {   opacity: 0;   text-decoration: none;   -webkit-font-smoothing: antialiased;   -moz-osx-font-smoothing: grayscale; }",e.sheet.cssRules.length),e.sheet.insertRule(" *:hover > .anchorjs-link, .anchorjs-link:focus  {   opacity: 1; }",e.sheet.cssRules.length),e.sheet.insertRule(" [data-anchorjs-icon]::after {   content: attr(data-anchorjs-icon); }",e.sheet.cssRules.length),e.sheet.insertRule(' @font-face {   font-family: "anchorjs-icons";   src: url(data:n/a;base64,AAEAAAALAIAAAwAwT1MvMg8yG2cAAAE4AAAAYGNtYXDp3gC3AAABpAAAAExnYXNwAAAAEAAAA9wAAAAIZ2x5ZlQCcfwAAAH4AAABCGhlYWQHFvHyAAAAvAAAADZoaGVhBnACFwAAAPQAAAAkaG10eASAADEAAAGYAAAADGxvY2EACACEAAAB8AAAAAhtYXhwAAYAVwAAARgAAAAgbmFtZQGOH9cAAAMAAAAAunBvc3QAAwAAAAADvAAAACAAAQAAAAEAAHzE2p9fDzz1AAkEAAAAAADRecUWAAAAANQA6R8AAAAAAoACwAAAAAgAAgAAAAAAAAABAAADwP/AAAACgAAA/9MCrQABAAAAAAAAAAAAAAAAAAAAAwABAAAAAwBVAAIAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAMCQAGQAAUAAAKZAswAAACPApkCzAAAAesAMwEJAAAAAAAAAAAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAQAAg//0DwP/AAEADwABAAAAAAQAAAAAAAAAAAAAAIAAAAAAAAAIAAAACgAAxAAAAAwAAAAMAAAAcAAEAAwAAABwAAwABAAAAHAAEADAAAAAIAAgAAgAAACDpy//9//8AAAAg6cv//f///+EWNwADAAEAAAAAAAAAAAAAAAAACACEAAEAAAAAAAAAAAAAAAAxAAACAAQARAKAAsAAKwBUAAABIiYnJjQ3NzY2MzIWFxYUBwcGIicmNDc3NjQnJiYjIgYHBwYUFxYUBwYGIwciJicmNDc3NjIXFhQHBwYUFxYWMzI2Nzc2NCcmNDc2MhcWFAcHBgYjARQGDAUtLXoWOR8fORYtLTgKGwoKCjgaGg0gEhIgDXoaGgkJBQwHdR85Fi0tOAobCgoKOBoaDSASEiANehoaCQkKGwotLXoWOR8BMwUFLYEuehYXFxYugC44CQkKGwo4GkoaDQ0NDXoaShoKGwoFBe8XFi6ALjgJCQobCjgaShoNDQ0NehpKGgobCgoKLYEuehYXAAAADACWAAEAAAAAAAEACAAAAAEAAAAAAAIAAwAIAAEAAAAAAAMACAAAAAEAAAAAAAQACAAAAAEAAAAAAAUAAQALAAEAAAAAAAYACAAAAAMAAQQJAAEAEAAMAAMAAQQJAAIABgAcAAMAAQQJAAMAEAAMAAMAAQQJAAQAEAAMAAMAAQQJAAUAAgAiAAMAAQQJAAYAEAAMYW5jaG9yanM0MDBAAGEAbgBjAGgAbwByAGoAcwA0ADAAMABAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAH//wAP) format("truetype"); }',e.sheet.cssRules.length)}(),t=document.querySelectorAll("[id]"),i=[].map.call(t,function(A){return A.id}),o=0;o<e.length;o++)if(this.hasAnchorJSLink(e[o]))d.push(o);else{if(e[o].hasAttribute("id"))n=e[o].getAttribute("id");else if(e[o].hasAttribute("data-anchor-id"))n=e[o].getAttribute("data-anchor-id");else{for(c=r=this.urlify(e[o].textContent),a=0;void 0!==s&&(c=r+"-"+a),a+=1,-1!==(s=i.indexOf(c)););s=void 0,i.push(c),e[o].setAttribute("id",c),n=c}(h=document.createElement("a")).className="anchorjs-link "+this.options.class,h.setAttribute("aria-label",this.options.ariaLabel),h.setAttribute("data-anchorjs-icon",this.options.icon),this.options.titleText&&(h.title=this.options.titleText),u=document.querySelector("base")?window.location.pathname+window.location.search:"",u=this.options.base||u,h.href=u+"#"+n,"always"===l&&(h.style.opacity="1"),""===this.options.icon&&(h.style.font="1em/1 anchorjs-icons","left"===this.options.placement&&(h.style.lineHeight="inherit")),"left"===this.options.placement?(h.style.position="absolute",h.style.marginLeft="-1em",h.style.paddingRight="0.5em",e[o].insertBefore(h,e[o].firstChild)):(h.style.paddingLeft="0.375em",e[o].appendChild(h))}for(o=0;o<d.length;o++)e.splice(d[o]-o,1);return this.elements=this.elements.concat(e),this},this.remove=function(A){for(var e,t,i=p(A),n=0;n<i.length;n++)(t=i[n].querySelector(".anchorjs-link"))&&(-1!==(e=this.elements.indexOf(i[n]))&&this.elements.splice(e,1),i[n].removeChild(t));return this},this.removeAll=function(){this.remove(this.elements)},this.urlify=function(A){return this.options.truncate||f(this.options),A.trim().replace(/\'/gi,"").replace(/[& +$,:;=?@"#{}|^~[`%!'<>\]\.\/\(\)\*\\\n\t\b\v]/g,"-").replace(/-{2,}/g,"-").substring(0,this.options.truncate).replace(/^-+|-+$/gm,"").toLowerCase()},this.hasAnchorJSLink=function(A){var e=A.firstChild&&-1<(" "+A.firstChild.className+" ").indexOf(" anchorjs-link "),t=A.lastChild&&-1<(" "+A.lastChild.className+" ").indexOf(" anchorjs-link ");return e||t||!1}}});
+
+</script>
+<script>
+    anchors.options.visible = 'always';
+    anchors.add();
+</script>
+
+
+            </div>
+            
+
+            
+            <div class="col-lg-3">
+                <div class="dropdown">
+                    <input style="margin-top: 15px; border-radius: 0 !important;" id="search_input" type="text" class="form-control" placeholder="Search" autocomplete="off" />
+                    <ul id="search_results" class="dropdown-menu" style="width: 100%; border-radius: 0 !important;"></ul>
+                </div>
+
+                <div style="background: #FF7900; border: 0; padding: 10px;" class="boxify">
+                    <img style="float: left;" width="20" height="20" src="/images/rss-logo-white@2x.png" alt="rss logo" />
+                    <span style="padding-left: 10px; color: #FFF;"><a class="subscribe-links" href="/index.xml">Subscribe via RSS</a></span>
+                </div>
+
+                
+                <div class="boxify">
+                    <p class="h3">latest posts</p>
+                    
+                    
+                    
+                    <p><a href="https://thornelabs.net/posts/replacing-the-nintendo-switch-joy-con-shells-from-gray-to-atomic-purple.html">Replacing the Nintendo Switch Joy-Con Shells: From Gray to Atomic Purple</a></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="https://thornelabs.net/posts/spell-checking-many-posts-with-aspell-and-a-custom-dictionary.html">Spell Checking Many Posts with aspell and a Custom Dictionary</a></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="https://thornelabs.net/posts/battery-tests-on-a-lenovo-thinkpad-x1-carbon-gen-6-running-ubuntu-1804-lts.html">Battery Tests on a Lenovo ThinkPad X1 Carbon Gen 6 Running Ubuntu 18.04 LTS</a></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="https://thornelabs.net/posts/google-cloud-load-balancer-component-diagrams.html">Google Cloud Load Balancer Component Diagrams</a></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="https://thornelabs.net/posts/installing-ubuntu-1804-lts-on-a-lenovo-thinkpad-x1-carbon-gen-6.html">Installing Ubuntu 18.04 LTS on a Lenovo ThinkPad X1 Carbon Gen 6</a></p>
+                    
+                    
+                </div>
+                
+
+                <div class="boxify">
+                    <p class="h3">top tags</p>
+                    
+                    
+                    
+                    <p><a href="/tags/documentation.html">documentation</a> <small>(154)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/openstack.html">openstack</a> <small>(21)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/linux.html">linux</a> <small>(18)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/cheat-sheet.html">cheat-sheet</a> <small>(16)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/os-x.html">os-x</a> <small>(15)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/shell.html">shell</a> <small>(15)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/vagrant.html">vagrant</a> <small>(11)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/apple.html">apple</a> <small>(10)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/ubuntu.html">ubuntu</a> <small>(10)</small></p>
+                    <hr />
+                    
+                    
+                    
+                    <p><a href="/tags/vmware-fusion.html">vmware-fusion</a> <small>(10)</small></p>
+                    
+                    
+                </div>
+
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-0017276619523269"
+                     data-ad-slot="3784984657"
+                     data-ad-format="rectangle"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            
+
+        </div>
+        
+    </div>
+
+    <div id="footer">
+        <div class="container">
+            <div class="row justify-content-center">
+                <img style="height: 100%" width="48" height="48" src="/images/dexter-96x96.png" alt="Dexter" />
+                <p style="margin-top: 13px">Thorne<strong>Labs</strong> is created using Bootstrap and Hugo.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/bootstrap-4.0.0.min.js"></script>
+
+    <script>
+        var searchJSONFile;
+
+        $(document).ready(function() {
+            
+            $("#search_input").one('focus', function() {
+                if (!searchJSONFile) {
+                    $.getJSON("/index.json", function(e) {
+                        
+                        searchJSONFile = e;
+                    });
+                }
+            });
+
+            
+            $("#search_input").keyup(function() {
+                
+                var e = $(this).val().toLowerCase();
+
+                
+                if ($('#search_input').val().trim().length === 0) {
+                    $('#search_results').hide();
+                }
+                else {
+                    $('#search_results').show();
+                }
+
+                doSearch(e);
+            });
+
+            
+            $(document).mouseup(function (e) {
+                var container = $("#search_results");
+
+                
+                
+                if (!container.is(e.target) && container.has(e.target).length === 0)
+                {
+                    container.hide();
+                }
+            });
+        });
+
+        
+        function doSearch(searchQuery) {
+            var results = [];
+            var resultsHTML = $("#search_results");
+            resultsHTML.html("");
+
+            $.each(searchJSONFile, function(t, n) {
+                var postTitle = n.title;
+                var postTitleLowerCase = n.title.toLowerCase();
+                var postHREF = n.href;
+
+                if (postTitleLowerCase.indexOf(searchQuery) !== -1) {
+                    results.push([postTitle, postHREF]);
+                }
+            });
+
+            if (results.length === 0) {
+                
+                $('#search_results').hide();
+            }
+            else {
+                $.each(results, function(t, n) {
+                    resultsHTML.append('<li><a class="dropdown-item dropdown-item-custom" href="' + n[1] + '">' + n[0] + '</a></li>');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
