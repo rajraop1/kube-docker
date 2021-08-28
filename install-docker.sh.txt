@@ -7,6 +7,7 @@
 sudo apt-get update
 
 sudo apt-get install \
+	--assume-yes \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -21,13 +22,16 @@ echo \
 
 sudo apt-get update
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get install --assume-yes docker-ce docker-ce-cli containerd.io
 
 sudo docker run hello-world
 
 sudo groupadd docker
 
 sudo usermod -aG docker $USER
+
+echo Now executing new group to update group membership
+echo Exit now
 
 newgrp docker 
 
@@ -36,6 +40,8 @@ docker run hello-world
 sudo systemctl enable docker.service
 
 sudo systemctl enable containerd.service
+
+echo running as regular user
 
 docker images
 
