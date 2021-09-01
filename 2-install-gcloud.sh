@@ -6,7 +6,7 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyr
 
 sudo apt-get update && sudo apt-get install --assume=yes google-cloud-sdk
 
-sudo apt-get install google-cloud-sdk-app-engine-java
+sudo apt-get install --assume=yes google-cloud-sdk-app-engine-java
 
 
 #kubectl
@@ -17,4 +17,9 @@ curl -LO https://dl.k8s.io/release/v1.17.15/bin/linux/amd64/kubectl -o kubectl
 chmod 777 kubectl
 
 sudo cp kubectl /usr/local/bin
+
+kubectl version
+
+gcloud init
+
 
